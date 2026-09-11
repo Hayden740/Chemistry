@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Balancing lab | Year 9 Chemistry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-activity="balancing-lab">
+<main class="wrap lab">
+  <div class="page-head narrow-head">
+    <h1>Balancing lab</h1>
+    <p class="lede">Use the + and &minus; buttons to change the coefficients. When every element matches, press Check. Solve <strong>10 equations</strong> to complete the activity.</p>
+  </div>
+
+  <div class="lab-controls">
+    <div class="tabs" role="tablist" aria-label="Choose a level" id="levelTabs"></div>
+    <div class="toggles">
+      <label class="toggle"><input type="checkbox" id="tallyToggle" checked> Live atom tally</label>
+      <label class="toggle"><input type="checkbox" id="particleToggle" checked> Particle view</label>
+    </div>
+  </div>
+
+  <div class="lab-picker" id="picker" aria-label="Choose an equation"></div>
+
+  <div class="lab-grid">
+    <section class="panel lab-main" aria-labelledby="eqName">
+      <p class="small" id="solvedLine"></p>
+      <h2 class="scenario-title" id="eqName"></h2>
+      <p class="words" id="eqWords"></p>
+      <div class="lab-eq" id="labEq"></div>
+      <div class="btn-row">
+        <button type="button" class="btn btn-primary" id="checkBtn">Check</button>
+        <button type="button" class="btn btn-quiet" id="hintBtn">Hint</button>
+        <button type="button" class="btn btn-quiet" id="resetBtn">Reset to 1s</button>
+        <button type="button" class="btn" id="nextBtn">Next equation</button>
+      </div>
+      <div class="feedback" id="labFb" hidden aria-live="polite"></div>
+      <div id="particles" class="lab-particles"></div>
+    </section>
+
+    <aside class="panel lab-tally" id="tallyPanel" aria-live="polite">
+      <h3>Atom tally</h3>
+      <div id="tally"></div>
+      <p class="small">A row turns green when that element has the same number of atoms on both sides.</p>
+    </aside>
+  </div>
+</main>
+
+<script src="../js/lesson.js"></script>
+<script src="../js/equations.js"></script>
+<script>
+(function () {
+  const { el, Chem, stepper, Progress } = Lesson;
+  const BANK = window.EQUATIONS;
+  const GOAL = 10;
+  const LEVEL_NAMES = { 1: 'Level 1: warm up', 2: 'Level 2: getting harder', 3: 'Level 3: expert' };
+
+  let level = 1, index = 0, coefs = [], solved = new Set(Progress.get('labSolved', []));
+  const $ = id => document.getElementById(id);
+
+  function key(l, i) { return l + '-' + i; }
+
+  function renderTabs() {
+    const tabs = $('levelTabs');
+    tabs.innerHTML = '';
+    [1, 2, 3].forEach(l => {
+      const count = BANK[l].filter((_, i) => solved.has(key(l, i))).length;
+      tabs.append(el('button', { type: 'button', class: 'tab', role: 'tab', 'aria-selected': String(l === level),
+        text: LEVEL_NAMES[l] + ' (' + count + '/' + BANK[l].length + ')',
+        onclick: () => { level = l; index = firstUnsolved(l); load(); } }));
+    });
+  }
+  function renderPicker() {
+    const p = $('picker');
+    p.innerHTML = '';
+    BANK[level].forEach((eq, i) => {
+      const done = solved.has(key(level, i));
+      p.append(el('button', { type: 'button', class: 'pick' + (i === index ? ' is-current' : '') + (done ? ' is-solved' : ''),
+        'aria-label': 'Equation ' + (i + 1) + ': ' + eq.name + (done ? ', solved' : ''),
+        'aria-current': i === index ? 'true' : 'false',
+        text: done ? '\u2713' : String(i + 1), onclick: () => { index = i; load(); } }));
+    });
+  }
+  function firstUnsolved(l) {
+    const i = BANK[l].findIndex((_, k) => !solved.has(key(l, k)));
+    return i === -1 ? 0 : i;
+  }
+
+  function current() { return BANK[level][index]; }
+
+  function load() {
+    const eq = current();
+    coefs = eq.reactants.concat(eq.products).map(() => 1);
+    $('eqName').textContent = (index + 1) + '. ' + eq.name;
+    $('eqWords').innerHTML = eq.words;
+    $('labFb').hidden = true;
+    const holder = $('labEq');
+    holder.innerHTML = '';
+    const all = eq.reactants.concat(eq.products);
+    all.forEach((f, k) => {
+      if (k > 0) holder.append(el('span', { class: 'op', html: k === eq.reactants.length ? '&rarr;' : '+' }));
+      const st = stepper({ value: 1, min: 1, max: 15, label: 'coefficient of ' + f, onChange: v => { coefs[k] = v; $('labFb').hidden = true; update(); } });
+      holder.append(el('span', { class: 'lab-term' }, [st.node, el('span', { class: 'lab-formula', html: Chem.fhtml(f) })]));
+    });
+    renderTabs(); renderPicker();
+    update();
+  }
+
+  function update() {
+    const eq = current();
+    const s = Chem.status(eq, coefs);
+    // tally table
+    const tbody = el('tbody');
+    s.rows.forEach(r => {
+      const ok = r.left === r.right;
+      tbody.append(el('tr', { class: ok ? 'ok' : 'off' }, [
+        el('td', { html: '<strong>' + r.el + '</strong> <span class="small">' + Chem.NAMES[r.el] + '</span>' }),
+        el('td', { class: 'num', text: r.left }),
+        el('td', { class: 'num', text: r.right }),
+        el('td', { class: 'mark', text: ok ? '\u2713' : '\u2717', 'aria-label': ok ? 'matches' : 'does not match' })
+      ]));
+    });
+    $('tally').innerHTML = '';
+    $('tally').append(el('table', { class: 'tally' }, [
+      el('thead', null, [el('tr', null, [el('th', { text: 'Element' }), el('th', { class: 'num', text: 'Left' }), el('th', { class: 'num', text: 'Right' }), el('th', { text: '' })])]),
+      tbody
+    ]));
+
+    // particle view
+    const pv = $('particles');
+    pv.innerHTML = '';
+    if ($('particleToggle').checked) {
+      const r = eq.reactants.length;
+      const left = Chem.particleSide(eq.reactants, coefs.slice(0, r), 60);
+      const right = Chem.particleSide(eq.products, coefs.slice(r), 60);
+      if (left && right) {
+        pv.append(el('div', { class: 'reaction-fig' }, [left, el('span', { class: 'big-arrow', html: '&rarr;', 'aria-hidden': 'true' }), right]), Chem.legend(s.rows.map(x => x.el)));
+      } else {
+        pv.append(el('p', { class: 'small', text: 'Too many atoms to draw clearly. Use the tally instead.' }));
+      }
+    }
+    $('solvedLine').textContent = 'Solved ' + solved.size + ' of 36. ' + (solved.size >= GOAL ? 'Activity complete, keep going.' : (GOAL - solved.size) + ' more to complete the activity.');
+  }
+
+  $('tallyToggle').addEventListener('change', e => { $('tallyPanel').hidden = !e.target.checked; document.querySelector('.lab-grid').classList.toggle('no-tally', !e.target.checked); });
+  $('particleToggle').addEventListener('change', update);
+
+  $('checkBtn').addEventListener('click', () => {
+    const eq = current();
+    const s = Chem.status(eq, coefs);
+    const fb = $('labFb');
+    fb.hidden = false;
+    if (s.balanced && s.simplest) {
+      const k = key(level, index);
+      const isNew = !solved.has(k);
+      solved.add(k);
+      Progress.set('labSolved', [...solved]);
+      fb.className = 'feedback good';
+      fb.innerHTML = '<strong>Balanced.</strong> <span class="eq-inline">' + Chem.equationHTML(eq, coefs) + '</span>' +
+        (eq.name === 'Check before you change' ? '<br>This one was balanced from the start. Always count before you change anything.' : '');
+      renderTabs(); renderPicker(); update();
+      if (isNew && solved.size >= GOAL) Progress.markDone('balancing-lab');
+      $('nextBtn').focus();
+    } else if (s.balanced) {
+      fb.className = 'feedback bad';
+      fb.innerHTML = '<strong>Balanced, but not finished.</strong> Every coefficient can be divided by ' + s.divisor + '. Use the lowest whole numbers.';
+    } else {
+      const off = s.rows.filter(r => r.left !== r.right);
+      fb.className = 'feedback bad';
+      fb.innerHTML = '<strong>Not balanced yet.</strong> ' + off.length + (off.length === 1 ? ' element does' : ' elements do') + ' not match: ' + off.map(r => Chem.NAMES[r.el]).join(', ') + '.';
+    }
+  });
+
+  $('hintBtn').addEventListener('click', () => {
+    const eq = current();
+    const s = Chem.status(eq, coefs);
+    const fb = $('labFb');
+    fb.hidden = false; fb.className = 'feedback info';
+    if (s.balanced && !s.simplest) { fb.innerHTML = '<strong>Hint:</strong> divide every coefficient by ' + s.divisor + '.'; return; }
+    if (s.balanced) { fb.innerHTML = '<strong>Hint:</strong> everything matches. Press Check.'; return; }
+    const off = s.rows.filter(r => r.left !== r.right);
+    // prefer an element that is not on its own, as in the method
+    const alone = e => eq.reactants.concat(eq.products).some(f => { const p = Chem.parse(f); return Object.keys(p).length === 1 && p[e]; });
+    const target = off.find(r => !alone(r.el)) || off[0];
+    fb.innerHTML = '<strong>Hint:</strong> look at ' + Chem.NAMES[target.el] + '. There ' + (target.left === 1 ? 'is 1' : 'are ' + target.left) + ' on the left and ' + target.right + ' on the right. Which coefficient could you change to fix it?';
+  });
+
+  $('resetBtn').addEventListener('click', load);
+  $('nextBtn').addEventListener('click', () => {
+    if (index < BANK[level].length - 1) index++;
+    else if (level < 3) { level++; index = firstUnsolved(level); }
+    else index = 0;
+    load();
+    $('eqName').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+
+  index = firstUnsolved(1);
+  load();
+})();
+</script>
+</body>
+</html>

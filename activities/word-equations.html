@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Word equation builder | Year 9 Chemistry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-activity="word-equations">
+<main class="narrow">
+  <div class="page-head">
+    <h1>Word equation builder</h1>
+    <p class="lede">A word equation names every reactant and product. It is the first step before writing formulas.</p>
+  </div>
+
+  <h2 class="section-title">Part A: build the equation</h2>
+  <p>Read the description. Choose the <strong>Reactants</strong> or <strong>Products</strong> box, then tap names to put them in it. Tap a name in a box to send it back. Watch out, some names do not belong.</p>
+
+  <section class="panel" aria-live="polite">
+    <div class="scorebar">
+      <span>Reaction <b id="bNum">1</b> of <b id="bTotal">12</b></span>
+      <span>First try correct <b id="bScore">0</b></span>
+    </div>
+    <div id="builder"></div>
+  </section>
+
+  <h2 class="section-title">Part B: reaction patterns</h2>
+  <p>Many reactions follow a pattern. Once you know the pattern, you can predict the products without being told.</p>
+  <div class="patterns">
+    <div class="pattern"><p class="pattern-eq">metal + acid &rarr; salt + hydrogen</p><p class="small">zinc + hydrochloric acid &rarr; zinc chloride + hydrogen</p></div>
+    <div class="pattern"><p class="pattern-eq">acid + metal hydroxide &rarr; salt + water</p><p class="small">hydrochloric acid + sodium hydroxide &rarr; sodium chloride + water</p></div>
+    <div class="pattern"><p class="pattern-eq">acid + metal carbonate &rarr; salt + water + carbon dioxide</p><p class="small">hydrochloric acid + calcium carbonate &rarr; calcium chloride + water + carbon dioxide</p></div>
+    <div class="pattern"><p class="pattern-eq">fuel + oxygen &rarr; carbon dioxide + water</p><p class="small">methane + oxygen &rarr; carbon dioxide + water, when a fuel made of carbon and hydrogen burns completely</p></div>
+  </div>
+  <h3>Naming the salt</h3>
+  <p>The salt's first name comes from the metal. The second name comes from the acid.</p>
+  <div class="table-scroll">
+    <table class="plain">
+      <thead><tr><th>Acid</th><th>Salt ending</th><th>Example with magnesium</th></tr></thead>
+      <tbody>
+        <tr><td>hydrochloric acid</td><td>chloride</td><td>magnesium chloride</td></tr>
+        <tr><td>sulfuric acid</td><td>sulfate</td><td>magnesium sulfate</td></tr>
+        <tr><td>nitric acid</td><td>nitrate</td><td>magnesium nitrate</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="section-title">Part C: predict the products</h2>
+  <p>Use the patterns to choose the correct products.</p>
+  <div id="predict"></div>
+</main>
+
+<script src="../js/lesson.js"></script>
+<script>
+(function () {
+  const { el, shuffle, mcq, Progress } = Lesson;
+
+  const TASKS = [
+    { text: 'Magnesium ribbon burns in oxygen with a bright white flame, making magnesium oxide.', r: ['magnesium', 'oxygen'], p: ['magnesium oxide'], extra: ['light', 'magnesium chloride'] },
+    { text: 'Zinc reacts with hydrochloric acid. Zinc chloride forms and bubbles of hydrogen gas are given off.', r: ['zinc', 'hydrochloric acid'], p: ['zinc chloride', 'hydrogen'], extra: ['chlorine', 'water'] },
+    { text: 'Carbon dioxide and water are made when methane burns in oxygen.', r: ['methane', 'oxygen'], p: ['carbon dioxide', 'water'], extra: ['heat', 'hydrogen'] },
+    { text: 'Sodium hydroxide neutralises hydrochloric acid, making sodium chloride and water.', r: ['sodium hydroxide', 'hydrochloric acid'], p: ['sodium chloride', 'water'], extra: ['hydrogen', 'sodium'] },
+    { text: 'Calcium carbonate reacts with hydrochloric acid, producing calcium chloride, water and carbon dioxide.', r: ['calcium carbonate', 'hydrochloric acid'], p: ['calcium chloride', 'water', 'carbon dioxide'], extra: ['calcium oxide', 'oxygen'] },
+    { text: 'When copper carbonate is heated, it breaks down into copper oxide and carbon dioxide.', r: ['copper carbonate'], p: ['copper oxide', 'carbon dioxide'], extra: ['heat', 'copper'] },
+    { text: 'In a hot flame, iron filings react with oxygen to form iron oxide.', r: ['iron', 'oxygen'], p: ['iron oxide'], extra: ['iron sulfide', 'carbon dioxide'] },
+    { text: 'In photosynthesis, plants use carbon dioxide and water to make glucose and oxygen.', r: ['carbon dioxide', 'water'], p: ['glucose', 'oxygen'], extra: ['sunlight', 'chlorophyll'] },
+    { text: 'In respiration, your cells use glucose and oxygen to release energy, making carbon dioxide and water.', r: ['glucose', 'oxygen'], p: ['carbon dioxide', 'water'], extra: ['energy', 'hydrogen'] },
+    { text: 'Sodium metal reacts with water, producing sodium hydroxide and hydrogen gas.', r: ['sodium', 'water'], p: ['sodium hydroxide', 'hydrogen'], extra: ['oxygen', 'sodium chloride'] },
+    { text: 'Hydrogen peroxide breaks down to form water and oxygen gas.', r: ['hydrogen peroxide'], p: ['water', 'oxygen'], extra: ['hydrogen', 'manganese dioxide'] },
+    { text: 'Hydrogen gas and magnesium sulfate form when magnesium is added to sulfuric acid.', r: ['magnesium', 'sulfuric acid'], p: ['magnesium sulfate', 'hydrogen'], extra: ['water', 'sulfur'] }
+  ];
+  const NOT_SUBSTANCES = ['light', 'heat', 'energy', 'sunlight'];
+  const NOTES = {
+    'chlorophyll': 'Chlorophyll helps photosynthesis happen but is not used up, so it is not a reactant.',
+    'manganese dioxide': 'Manganese dioxide is often added to speed this reaction up, but it is not used up. It is not part of the word equation unless it is mentioned as a reactant.'
+  };
+
+  const builder = document.getElementById('builder');
+  let ti = 0, firstTry = 0, doneA = false, doneC = false;
+  document.getElementById('bTotal').textContent = TASKS.length;
+
+  function checkComplete() { if (doneA && doneC) Progress.markDone('word-equations'); }
+
+  function showTask() {
+    const t = TASKS[ti];
+    let active = 'r', tries = 0;
+    const placed = { r: [], p: [] };
+    builder.innerHTML = '';
+    document.getElementById('bNum').textContent = ti + 1;
+
+    const zoneR = el('div', { class: 'zone-tiles' }), zoneP = el('div', { class: 'zone-tiles' });
+    const zR = el('button', { type: 'button', class: 'zone is-active', 'aria-pressed': 'true' }, [el('span', { class: 'zone-label', text: 'Reactants' })]);
+    const zP = el('button', { type: 'button', class: 'zone', 'aria-pressed': 'false' }, [el('span', { class: 'zone-label', text: 'Products' })]);
+    const zoneWrapR = el('div', { class: 'zone-wrap' }, [zR, zoneR]);
+    const zoneWrapP = el('div', { class: 'zone-wrap' }, [zP, zoneP]);
+    const bank = el('div', { class: 'bank' });
+    const fb = el('div', { class: 'feedback', hidden: '' });
+    const checkBtn = el('button', { type: 'button', class: 'btn btn-primary', text: 'Check' });
+    const showBtn = el('button', { type: 'button', class: 'btn btn-quiet', text: 'Show the answer', hidden: '' });
+    const nextBtn = el('button', { type: 'button', class: 'btn', hidden: '', text: ti + 1 < TASKS.length ? 'Next reaction' : 'Finish part A' });
+
+    function setActive(s) {
+      active = s;
+      zR.classList.toggle('is-active', s === 'r'); zR.setAttribute('aria-pressed', String(s === 'r'));
+      zP.classList.toggle('is-active', s === 'p'); zP.setAttribute('aria-pressed', String(s === 'p'));
+    }
+    zR.addEventListener('click', () => setActive('r'));
+    zP.addEventListener('click', () => setActive('p'));
+
+    const all = shuffle(t.r.concat(t.p, t.extra).filter((v, i, a) => a.indexOf(v) === i));
+    function draw() {
+      bank.innerHTML = ''; zoneR.innerHTML = ''; zoneP.innerHTML = '';
+      const makeTile = (name, where) => {
+        const tile = el('button', { type: 'button', class: 'tile word-tile', text: name });
+        tile.addEventListener('click', () => {
+          if (where) placed[where] = placed[where].filter(n => n !== name);
+          else placed[active].push(name);
+          fb.hidden = true;
+          draw();
+        });
+        return tile;
+      };
+      all.filter(n => !placed.r.includes(n) && !placed.p.includes(n)).forEach(n => bank.append(makeTile(n, null)));
+      ['r', 'p'].forEach(side => {
+        const z = side === 'r' ? zoneR : zoneP;
+        if (!placed[side].length) z.append(el('span', { class: 'zone-empty', text: 'Empty' }));
+        placed[side].forEach((n, i) => {
+          if (i) z.append(el('span', { class: 'plus', text: '+', 'aria-hidden': 'true' }));
+          z.append(makeTile(n, side));
+        });
+      });
+      if (!bank.children.length) bank.append(el('span', { class: 'zone-empty', text: 'All names used' }));
+    }
+    draw();
+
+    const sameSet = (a, b) => a.length === b.length && a.every(x => b.includes(x));
+    const answerText = () => t.r.join(' + ') + ' &rarr; ' + t.p.join(' + ');
+
+    checkBtn.addEventListener('click', () => {
+      tries++;
+      const okR = sameSet(placed.r, t.r), okP = sameSet(placed.p, t.p);
+      fb.hidden = false;
+      if (okR && okP) {
+        if (tries === 1) firstTry++;
+        document.getElementById('bScore').textContent = firstTry;
+        fb.className = 'feedback good';
+        fb.innerHTML = '<strong>Correct.</strong> <span class="words-final">' + answerText() + '</span>';
+        [...builder.querySelectorAll('.tile, .zone')].forEach(b => { b.disabled = true; });
+        checkBtn.hidden = true; showBtn.hidden = true; nextBtn.hidden = false; nextBtn.focus();
+        return;
+      }
+      const msgs = [];
+      const used = placed.r.concat(placed.p);
+      const wrongSide = t.r.filter(n => placed.p.includes(n)).concat(t.p.filter(n => placed.r.includes(n)));
+      const missing = t.r.concat(t.p).filter(n => !used.includes(n));
+      const extras = used.filter(n => t.extra.includes(n));
+      if (wrongSide.length) msgs.push('On the wrong side: ' + wrongSide.join(', ') + '.');
+      if (missing.length) msgs.push('Something is missing. Re-read the description.');
+      if (extras.length) {
+        msgs.push('Does not belong: ' + extras.join(', ') + '.');
+        extras.forEach(x => {
+          if (NOT_SUBSTANCES.includes(x)) msgs.push('Energy, heat and light are not substances, so they never go in a word equation.');
+          if (NOTES[x]) msgs.push(NOTES[x]);
+        });
+      }
+      fb.className = 'feedback bad';
+      fb.innerHTML = '<strong>Not yet.</strong> ' + msgs.join(' ');
+      if (tries >= 2) showBtn.hidden = false;
+    });
+    showBtn.addEventListener('click', () => {
+      placed.r = t.r.slice(); placed.p = t.p.slice(); draw();
+      fb.hidden = false; fb.className = 'feedback info';
+      fb.innerHTML = '<strong>Answer:</strong> <span class="words-final">' + answerText() + '</span>';
+      [...builder.querySelectorAll('.tile, .zone')].forEach(b => { b.disabled = true; });
+      checkBtn.hidden = true; showBtn.hidden = true; nextBtn.hidden = false; nextBtn.focus();
+    });
+    nextBtn.addEventListener('click', () => {
+      ti++;
+      if (ti < TASKS.length) showTask();
+      else {
+        builder.innerHTML = '';
+        builder.append(
+          el('p', { class: 'quiz-score', text: 'Part A complete. ' + firstTry + ' of ' + TASKS.length + ' correct on the first try.' }),
+          el('div', { class: 'btn-row' }, [el('button', { type: 'button', class: 'btn', text: 'Do part A again', onclick: () => { ti = 0; firstTry = 0; document.getElementById('bScore').textContent = 0; showTask(); } })])
+        );
+        doneA = true; checkComplete();
+      }
+    });
+
+    builder.append(
+      el('p', { class: 'scenario-text', text: t.text }),
+      el('div', { class: 'zones' }, [zoneWrapR, el('span', { class: 'big-arrow', html: '&rarr;', 'aria-hidden': 'true' }), zoneWrapP]),
+      el('p', { class: 'small bank-label', text: 'Names to choose from' }),
+      bank,
+      el('div', { class: 'btn-row' }, [checkBtn, showBtn, nextBtn]),
+      fb
+    );
+  }
+  showTask();
+
+  mcq(document.getElementById('predict'), [
+    { q: 'magnesium + sulfuric acid &rarr; ?', options: ['magnesium sulfate + hydrogen', 'magnesium chloride + hydrogen', 'magnesium sulfate + water', 'magnesium oxide + hydrogen'], answer: 0,
+      explain: 'Metal + acid makes a salt and hydrogen. Sulfuric acid makes sulfates.' },
+    { q: 'sodium hydroxide + nitric acid &rarr; ?', options: ['sodium nitrate + hydrogen', 'sodium nitrate + water', 'sodium chloride + water', 'sodium oxide + water'], answer: 1,
+      explain: 'Acid + metal hydroxide makes a salt and water. Nitric acid makes nitrates.' },
+    { q: 'calcium carbonate + nitric acid &rarr; ?', options: ['calcium nitrate + water', 'calcium nitrate + hydrogen', 'calcium nitrate + water + carbon dioxide', 'calcium oxide + carbon dioxide'], answer: 2,
+      explain: 'Acid + metal carbonate makes a salt, water and carbon dioxide.' },
+    { q: 'zinc + hydrochloric acid &rarr; ?', options: ['zinc chloride + water', 'zinc chloride + hydrogen', 'zinc hydroxide + chlorine', 'zinc oxide + hydrogen'], answer: 1,
+      explain: 'Metal + acid makes a salt and hydrogen. Hydrochloric acid makes chlorides.' },
+    { q: 'propane + oxygen &rarr; ?', options: ['carbon dioxide + hydrogen', 'carbon + water', 'carbon dioxide + water', 'propane oxide'], answer: 2,
+      explain: 'Propane is a fuel made of carbon and hydrogen. When it burns completely it makes carbon dioxide and water.' },
+    { q: 'potassium hydroxide + sulfuric acid &rarr; ?', options: ['potassium sulfate + water', 'potassium sulfate + hydrogen', 'potassium sulfide + water', 'potassium chloride + water'], answer: 0,
+      explain: 'Acid + metal hydroxide makes a salt and water.' },
+    { q: 'copper carbonate + hydrochloric acid &rarr; ?', options: ['copper chloride + hydrogen', 'copper chloride + water + carbon dioxide', 'copper oxide + carbon dioxide', 'copper carbonate + hydrogen chloride'], answer: 1,
+      explain: 'Acid + metal carbonate makes a salt, water and carbon dioxide. The fizzing is the carbon dioxide.' },
+    { q: 'iron + sulfuric acid &rarr; ?', options: ['iron sulfate + water', 'iron oxide + hydrogen', 'iron sulfate + hydrogen', 'iron + hydrogen sulfate'], answer: 2,
+      explain: 'Metal + acid makes a salt and hydrogen.' }
+  ], { onDone: () => { doneC = true; checkComplete(); } });
+})();
+</script>
+</body>
+</html>

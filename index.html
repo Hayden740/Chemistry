@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nothing lost, nothing made | Year 9 Chemistry</title>
+  <meta name="description" content="Year 9 online lesson on the law of conservation of mass, writing chemical equations and balancing them.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="home">
+  <div class="site-bar">
+    <div class="wrap"><strong>Seaford Secondary College</strong><span>Year 9 Science: Chemical sciences</span></div>
+  </div>
+
+  <main>
+    <section class="hero wrap">
+      <div class="hero-text">
+        <h1><span>Nothing lost,</span><span>nothing made.</span></h1>
+        <p class="lede">In a chemical reaction, atoms swap partners but never disappear. In this lesson you will prove it, write it down as an equation, and balance it.</p>
+        <a class="btn btn-primary" id="startBtn" href="activities/nothing-is-lost.html">Start activity 1</a>
+      </div>
+
+      <figure class="hero-scale part-3">
+        <svg viewBox="0 0 520 330" role="img" aria-labelledby="scaleTitle">
+          <title id="scaleTitle">A balance scale weighing the atoms on each side of the equation for making water</title>
+          <rect x="195" y="300" width="130" height="16" rx="8" fill="#013148"/>
+          <rect x="254" y="92" width="12" height="212" fill="#013148"/>
+          <g id="beam" style="transform-box: view-box; transform-origin: 260px 90px;">
+            <rect x="70" y="85" width="380" height="10" rx="5" fill="#013148"/>
+          </g>
+          <g class="pan" id="panL">
+            <line x1="0" y1="0" x2="-72" y2="118" stroke="#013148" stroke-width="2"/>
+            <line x1="0" y1="0" x2="72" y2="118" stroke="#013148" stroke-width="2"/>
+            <g id="partsL"></g>
+            <path d="M -88 118 Q 0 158 88 118 Z" fill="#FFFFFF" stroke="#013148" stroke-width="3"/>
+            <text x="0" y="174" text-anchor="middle" font-size="15" font-weight="700" fill="#45606F">Reactants</text>
+          </g>
+          <g class="pan" id="panR">
+            <line x1="0" y1="0" x2="-72" y2="118" stroke="#013148" stroke-width="2"/>
+            <line x1="0" y1="0" x2="72" y2="118" stroke="#013148" stroke-width="2"/>
+            <g id="partsR"></g>
+            <path d="M -88 118 Q 0 158 88 118 Z" fill="#FFFFFF" stroke="#013148" stroke-width="3"/>
+            <text x="0" y="174" text-anchor="middle" font-size="15" font-weight="700" fill="#45606F">Products</text>
+          </g>
+          <circle cx="260" cy="90" r="11" fill="#BDD675" stroke="#013148" stroke-width="3"/>
+        </svg>
+
+        <div class="scale-eq" id="scaleEq" aria-label="Equation with adjustable coefficients"></div>
+        <div class="scale-readout">
+          <div>Left side <br><b id="countL">2 H, 2 O</b></div>
+          <div>Right side <br><b id="countR">2 H, 1 O</b></div>
+        </div>
+        <p class="scale-status" id="scaleStatus" aria-live="polite"></p>
+        <figcaption>The scale weighs the atoms written on each side. Change the big numbers until it sits level.</figcaption>
+      </figure>
+    </section>
+
+    <section class="intentions wrap">
+      <div>
+        <h2>Learning intentions</h2>
+        <ul>
+          <li>Understand that atoms are rearranged, not created or destroyed, in a chemical reaction.</li>
+          <li>Learn how to represent reactions with word equations and symbol equations.</li>
+          <li>Learn how to balance a chemical equation.</li>
+        </ul>
+      </div>
+      <div>
+        <h2>Success criteria</h2>
+        <p>I can:</p>
+        <ul>
+          <li>explain the law of conservation of mass using the idea of atoms</li>
+          <li>predict and explain mass changes in open and closed systems</li>
+          <li>calculate a missing mass in a reaction</li>
+          <li>write a word equation from a description</li>
+          <li>count the atoms in a chemical formula</li>
+          <li>balance an equation by changing coefficients, not subscripts</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="path wrap" aria-labelledby="pathTitle">
+      <div class="path-head">
+        <h2 id="pathTitle">Your activities</h2>
+        <div class="path-progress">
+          <p id="progressText">0 of 11 complete</p>
+          <div class="meter"><span id="progressMeter"></span></div>
+        </div>
+      </div>
+      <p class="small">Work through them in order. Your ticks are saved on this device and browser.</p>
+      <div id="activityList"></div>
+    </section>
+
+    <section class="keywords wrap" aria-labelledby="kwTitle">
+      <h2 id="kwTitle" class="section-title part-1">Key words</h2>
+      <dl>
+        <div><dt>Reactant</dt><dd>A substance you start with. Reactants go on the left of the arrow.</dd></div>
+        <div><dt>Product</dt><dd>A new substance made in the reaction. Products go on the right.</dd></div>
+        <div><dt>Law of conservation of mass</dt><dd>The total mass of the reactants equals the total mass of the products.</dd></div>
+        <div><dt>Closed system</dt><dd>A setup nothing can get into or out of, such as a sealed bottle.</dd></div>
+        <div><dt>Open system</dt><dd>A setup where substances, especially gases, can enter or escape.</dd></div>
+        <div><dt>Chemical formula</dt><dd>Symbols and numbers that show the atoms in a substance, such as H<sub>2</sub>O.</dd></div>
+        <div><dt>Subscript</dt><dd>The small number after a symbol. It counts atoms inside one particle.</dd></div>
+        <div><dt>Coefficient</dt><dd>The big number in front of a formula. It counts whole particles.</dd></div>
+        <div><dt>Balanced equation</dt><dd>An equation with the same number of each type of atom on both sides.</dd></div>
+      </dl>
+    </section>
+  </main>
+
+  <footer class="site-foot">
+    <div class="wrap">
+      <span>Year 9 Science, Seaford Secondary College. Australian Curriculum: AC9S9U07</span>
+      <button type="button" id="resetBtn">Clear my ticks</button>
+    </div>
+  </footer>
+
+  <script src="js/lesson.js"></script>
+  <script>
+  (function () {
+    const { ACTIVITIES, PARTS, Progress, el, stepper, Chem } = Lesson;
+
+    /* ----- Activity list ----- */
+    function renderList() {
+      const list = document.getElementById('activityList');
+      list.innerHTML = '';
+      [1, 2, 3].forEach(p => {
+        const part = el('section', { class: 'part part-' + p });
+        const acts = ACTIVITIES.filter(a => a.part === p);
+        part.append(el('h3', { class: 'part-title', html: 'Part ' + p + ': ' + PARTS[p].name + '<small>' + acts.length + ' activities</small>' }));
+        const ul = el('ul', { class: 'act-list' });
+        acts.forEach(a => {
+          const n = ACTIVITIES.indexOf(a) + 1;
+          const done = Progress.isDone(a.id);
+          ul.append(el('li', null, [
+            el('a', { class: 'act' + (done ? ' done' : ''), href: 'activities/' + a.file }, [
+              el('span', { class: 'act-num', 'aria-hidden': 'true', text: done ? '\u2713' : String(n) }),
+              el('span', null, [
+                el('span', { class: 'act-title', text: n + '. ' + a.title }),
+                el('span', { class: 'act-blurb', text: a.blurb })
+              ]),
+              el('span', { class: 'act-meta' }, [
+                el('span', { class: 'act-type', text: a.type }), el('br'),
+                document.createTextNode('About ' + a.mins + ' min'),
+                done ? el('span', { class: 'act-done', text: 'Completed' }) : null
+              ])
+            ])
+          ]));
+        });
+        part.append(ul);
+        list.append(part);
+      });
+      const count = Progress.doneCount();
+      document.getElementById('progressText').textContent = count + ' of ' + ACTIVITIES.length + ' complete';
+      document.getElementById('progressMeter').style.width = (count / ACTIVITIES.length * 100) + '%';
+      const btn = document.getElementById('startBtn');
+      const nextIdx = ACTIVITIES.findIndex(a => !Progress.isDone(a.id));
+      if (count === 0) { btn.textContent = 'Start activity 1'; btn.href = 'activities/' + ACTIVITIES[0].file; }
+      else if (nextIdx === -1) { btn.textContent = 'All done. Review any activity below'; btn.href = '#pathTitle'; }
+      else { btn.textContent = 'Continue with activity ' + (nextIdx + 1); btn.href = 'activities/' + ACTIVITIES[nextIdx].file; }
+    }
+    renderList();
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if (confirm('Clear all ticks and saved progress on this device?')) { Progress.reset(); renderList(); }
+    });
+
+    /* ----- Balance scale hero ----- */
+    const eq = { reactants: ['H2', 'O2'], products: ['H2O'] };
+    const coefs = [1, 1, 1];
+    const SVGNS = 'http://www.w3.org/2000/svg';
+    const ATOM = { H: { r: 9.5, fill: '#FFFFFF' }, O: { r: 13.5, fill: '#F46E63' } };
+
+    function circle(g, x, y, e) {
+      const c = document.createElementNS(SVGNS, 'circle');
+      c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', ATOM[e].r);
+      c.setAttribute('fill', ATOM[e].fill); c.setAttribute('stroke', '#013148'); c.setAttribute('stroke-width', '2');
+      g.append(c);
+    }
+    function drawMol(g, type, x, y) {
+      if (type === 'H2') { circle(g, x - 8, y + 4, 'H'); circle(g, x + 8, y + 4, 'H'); }
+      if (type === 'O2') { circle(g, x - 10.5, y, 'O'); circle(g, x + 10.5, y, 'O'); }
+      if (type === 'H2O') { circle(g, x - 13, y - 9, 'H'); circle(g, x + 13, y - 9, 'H'); circle(g, x, y, 'O'); }
+    }
+    function drawPan(gId, mols) {
+      const g = document.getElementById(gId);
+      g.innerHTML = '';
+      const slots = [-60, -20, 20, 60];
+      mols.forEach((m, i) => {
+        const row = Math.floor(i / 4), col = i % 4;
+        drawMol(g, m, slots[col], 106 - row * 32);
+      });
+    }
+
+    function update() {
+      const [a, b, c] = coefs;
+      drawPan('partsL', Array(a).fill('H2').concat(Array(b).fill('O2')));
+      drawPan('partsR', Array(c).fill('H2O'));
+
+      const massL = a * 2 + b * 32, massR = c * 18;
+      const d = massL - massR;
+      const tilt = d === 0 ? 0 : Math.sign(d) * Math.min(16, 4 + Math.abs(d) * 0.25);
+      const ang = -tilt * Math.PI / 180;
+      document.getElementById('beam').style.transform = 'rotate(' + (-tilt) + 'deg)';
+      const L = 180;
+      const lx = 260 - L * Math.cos(ang), ly = 90 - L * Math.sin(ang);
+      const rx = 260 + L * Math.cos(ang), ry = 90 + L * Math.sin(ang);
+      document.getElementById('panL').style.transform = 'translate(' + lx + 'px,' + ly + 'px)';
+      document.getElementById('panR').style.transform = 'translate(' + rx + 'px,' + ry + 'px)';
+
+      const s = Chem.status(eq, coefs);
+      const byEl = {}; s.rows.forEach(r => { byEl[r.el] = r; });
+      document.getElementById('countL').textContent = byEl.H.left + ' H, ' + byEl.O.left + ' O';
+      document.getElementById('countR').textContent = byEl.H.right + ' H, ' + byEl.O.right + ' O';
+      const msg = document.getElementById('scaleStatus');
+      if (!s.balanced) {
+        msg.textContent = 'Not balanced. ' + s.rows.filter(r => r.left !== r.right)
+          .map(r => Chem.NAMES[r.el][0].toUpperCase() + Chem.NAMES[r.el].slice(1) + ' atoms: ' + r.left + ' on the left, ' + r.right + ' on the right.').join(' ');
+      } else if (!s.simplest) {
+        msg.textContent = 'Level, but not finished. Every number can be divided by ' + s.divisor + '.';
+      } else {
+        msg.textContent = 'Balanced. ' + byEl.H.left + ' hydrogen and ' + byEl.O.left + ' oxygen atoms on each side, so no mass goes missing.';
+      }
+    }
+
+    const holder = document.getElementById('scaleEq');
+    const names = ['hydrogen molecules', 'oxygen molecules', 'water molecules'];
+    const parts = [];
+    eq.reactants.concat(eq.products).forEach((f, i) => {
+      const st = stepper({ value: 1, min: 1, max: 4, label: names[i], onChange: v => { coefs[i] = v; update(); } });
+      parts.push(el('span', { class: 'field' }, [st.node, el('span', { html: Chem.fhtml(f) })]));
+    });
+    holder.append(parts[0], el('span', { class: 'op', text: '+' }), parts[1], el('span', { class: 'op', html: '&rarr;' }), parts[2]);
+    update();
+  })();
+  </script>
+</body>
+</html>

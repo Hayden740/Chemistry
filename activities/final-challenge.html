@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final challenge | Year 9 Chemistry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-activity="final-challenge">
+<main class="narrow">
+  <div class="page-head">
+    <h1>Final challenge</h1>
+    <p class="lede">Fifteen questions covering the whole lesson. At the end you get a results summary to show your teacher.</p>
+  </div>
+
+  <section id="intro">
+    <div class="fc-intro">
+      <div><b>15</b> questions, 5 from each part</div>
+      <div><b>1</b> try per question, so check before you answer</div>
+      <div><b>New</b> questions every time you start</div>
+    </div>
+    <div class="callout tip">
+      <p>Have some paper handy. For the balancing questions there is no live tally, so count the atoms yourself before you press Check.</p>
+    </div>
+    <p id="bestLine" class="small"></p>
+    <div class="btn-row"><button type="button" class="btn btn-primary" id="startBtn">Start the challenge</button></div>
+  </section>
+
+  <section class="panel fc-run" id="run" hidden aria-live="polite">
+    <div class="scorebar">
+      <span>Question <b id="num">1</b> of <b>15</b></span>
+      <span>Score <b id="score">0</b></span>
+    </div>
+    <div class="meter"><span id="meter"></span></div>
+    <div id="qBox"></div>
+  </section>
+
+  <section id="results" hidden></section>
+</main>
+
+<script src="../js/lesson.js"></script>
+<script src="../js/equations.js"></script>
+<script>
+(function () {
+  const { el, shuffle, pick, randInt, round1, Progress, Chem, ACTIVITIES } = Lesson;
+  const BANK = window.EQUATIONS;
+  const g = n => n.toFixed(1) + ' g';
+  const PART_NAMES = { 1: 'Conservation of mass', 2: 'Writing equations', 3: 'Balancing equations' };
+
+  /* ================= Part 1: conservation of mass ================= */
+
+  function qLaw() {
+    return pick([
+      { type: 'mcq', part: 1, label: 'The law of conservation of mass',
+        q: 'Which statement is the law of conservation of mass?',
+        options: ['In a chemical reaction, the total mass of the reactants equals the total mass of the products',
+                  'In a chemical reaction, the products always weigh less because energy is released',
+                  'Mass is only conserved when a reaction happens in a sealed container',
+                  'Atoms can be created in a reaction, but never destroyed'],
+        answer: 0, explain: 'Atoms are rearranged, never created or destroyed, so the total mass stays the same. A sealed container only matters for measuring it.' },
+      { type: 'mcq', part: 1, label: 'Why mass is conserved',
+        q: 'Which is the best explanation of <em>why</em> mass is conserved in a chemical reaction?',
+        options: ['The atoms are rearranged into new substances, but no atoms are created or destroyed',
+                  'The products are the same substances as the reactants',
+                  'The molecules stay joined together the whole time',
+                  'Heat energy replaces any mass that is lost'],
+        answer: 0, explain: 'Bonds break and new bonds form, but every atom from the start is still there at the end.' }
+    ]);
+  }
+
+  function qPredict() {
+    const s = pick([
+      { text: 'Vinegar and baking soda are mixed in an open cup on a balance. It foams up.', a: 1,
+        explain: 'Carbon dioxide gas escapes from the open cup, so it is no longer weighed.' },
+      { text: 'Vinegar and baking soda are mixed in a plastic bottle with the lid screwed on tightly.', a: 2,
+        explain: 'The carbon dioxide is trapped in the sealed bottle, so every atom stays on the balance.' },
+      { text: 'Steel wool is burned on a heatproof mat sitting on a balance.', a: 0,
+        explain: 'Oxygen from the air joins onto the iron, so the product has extra mass from those oxygen atoms.' },
+      { text: 'Two solutions are mixed in an open beaker and a solid forms. No bubbles are seen.', a: 2,
+        explain: 'No gas is made or used, so all the atoms stay in the beaker.' },
+      { text: 'Magnesium ribbon is heated in an open crucible until it becomes white powder.', a: 0,
+        explain: 'Oxygen atoms from the air combine with the magnesium to make magnesium oxide.' }
+    ]);
+    return { type: 'mcq', part: 1, label: 'Predict a balance reading',
+      q: s.text + ' What happens to the balance reading?',
+      options: ['It goes up', 'It goes down', 'It stays the same'], answer: s.a, keepOrder: true, explain: s.explain };
+  }
+
+  function qMassClosed() {
+    const rx = pick([
+      { r: [['magnesium', 24], ['oxygen', 16]], p: [['magnesium oxide', 40]] },
+      { r: [['calcium carbonate', 100]], p: [['calcium oxide', 56], ['carbon dioxide', 44]] },
+      { r: [['hydrogen', 4], ['oxygen', 32]], p: [['water', 36]] },
+      { r: [['iron', 56], ['sulfur', 32]], p: [['iron sulfide', 88]] },
+      { r: [['carbon', 12], ['oxygen', 32]], p: [['carbon dioxide', 44]] },
+      { r: [['copper', 127], ['oxygen', 32]], p: [['copper oxide', 159]] }
+    ]);
+    const k = randInt(2, 9) / 10;
+    const sp = rx.r.map(x => ({ name: x[0], side: 'r', mass: round1(x[1] * k) }))
+      .concat(rx.p.map(x => ({ name: x[0], side: 'p', mass: round1(x[1] * k) })));
+    // make the totals exactly equal after rounding by adjusting the last product
+    const rTot = round1(sp.filter(x => x.side === 'r').reduce((a, b) => a + b.mass, 0));
+    const others = sp.filter(x => x.side === 'p').slice(0, -1).reduce((a, b) => a + b.mass, 0);
+    sp[sp.length - 1].mass = round1(rTot - others);
+    const unknown = pick(sp);
+    const known = sp.filter(x => x !== unknown).map(x => x.name + ' ' + g(x.mass));
+    const words = rx.r.map(x => x[0]).join(' + ') + ' &rarr; ' + rx.p.map(x => x[0]).join(' + ');
+    return { type: 'number', part: 1, label: 'Mass maths: find the ' + unknown.name,
+      q: '<span class="words">' + words + '</span><br>This reaction happens in a closed system. The known masses are: ' + known.join(', ') + '. What mass of <strong>' + unknown.name + '</strong> is involved?',
+      answer: unknown.mass, unit: 'g',
+      explain: 'Total mass of reactants = total mass of products, which here is ' + g(rTot) + '. The ' + unknown.name + ' is whatever is needed to make its side add up to ' + g(rTot) + ', so ' + g(unknown.mass) + '.' };
+  }
+
+  function qMassOpen() {
+    const s = pick([
+      { set: 'Marble chips are added to acid in an open flask.', gas: 'carbon dioxide', dir: -1 },
+      { set: 'Zinc is added to hydrochloric acid in an open flask.', gas: 'hydrogen', dir: -1 },
+      { set: 'Copper powder is heated in an open crucible until it turns black.', gas: 'oxygen', dir: 1 },
+      { set: 'An antacid tablet is dropped into water in an open beaker.', gas: 'carbon dioxide', dir: -1 }
+    ]);
+    const before = round1(randInt(1000, 2200) / 10);
+    const change = randInt(4, 25) / 10;
+    const after = round1(before + s.dir * change);
+    const verb = s.dir < 0 ? 'escaped into the air' : 'joined from the air';
+    return { type: 'number', part: 1, label: 'Open system: mass of ' + s.gas,
+      q: s.set + ' The balance reads ' + g(before) + ' at the start and ' + g(after) + ' at the end. What mass of <strong>' + s.gas + '</strong> ' + verb + '?',
+      answer: change, unit: 'g',
+      explain: 'In an open system the change in the reading is the mass of gas that got out or in: ' + (s.dir < 0 ? g(before) + ' &minus; ' + g(after) : g(after) + ' &minus; ' + g(before)) + ' = ' + g(change) + '.' };
+  }
+
+  function qExplain() {
+    return pick([
+      { type: 'mcq', part: 1, label: 'Explain a mass increase',
+        q: 'A student heats 2.4 g of magnesium in an open crucible. The magnesium oxide made has a mass of 4.0 g. What is the best explanation?',
+        options: ['Oxygen atoms from the air combined with the magnesium', 'The heat added mass to the magnesium', 'New atoms were created during the reaction', 'Mass is not conserved when things burn'],
+        answer: 0, explain: 'The extra 1.6 g is the mass of oxygen that joined on. Mass was conserved, but the oxygen was not weighed at the start.' },
+      { type: 'mcq', part: 1, label: 'Explain a mass decrease',
+        q: 'A 2 kg log burns completely and leaves only 50 g of ash. Where did most of the mass go?',
+        options: ['Into the air as carbon dioxide and water vapour', 'It was destroyed by the fire', 'It turned into heat and light energy', 'It soaked into the ground'],
+        answer: 0, explain: 'The atoms in the wood left as gases. Burning happens in an open system, so they were not weighed at the end.' },
+      { type: 'mcq', part: 1, label: 'Open or closed system',
+        q: 'Which set-up is a closed system?',
+        options: ['Fizzing tablet in a bottle with the lid screwed on', 'Candle burning on a bench', 'Acid and zinc in an open test tube', 'Water boiling in an open saucepan'],
+        answer: 0, explain: 'In a closed system nothing can get in or out, so the total mass on the balance cannot change.' }
+    ]);
+  }
+
+  /* ================= Part 2: writing equations ================= */
+
+  function qAtoms() {
+    const [c, f, e] = pick([
+      [3, 'Ca(OH)2', 'O'], [2, 'H2SO4', 'O'], [4, 'NH3', 'H'], [2, 'Al2(SO4)3', 'O'], [3, 'C2H6', 'H'],
+      [2, 'Mg(NO3)2', 'O'], [2, '(NH4)2SO4', 'H'], [5, 'H2O', 'H'], [3, 'Fe2O3', 'O'], [2, 'C6H12O6', 'C']
+    ]);
+    const per = Chem.parse(f)[e];
+    return { type: 'number', part: 2, label: 'Count ' + Chem.NAMES[e] + ' atoms',
+      q: 'How many <strong>' + Chem.NAMES[e] + '</strong> atoms are shown by <span class="eq-inline">' + Chem.withCoef(c, f) + '</span>?',
+      answer: per * c, unit: 'atoms', whole: true,
+      explain: 'One particle of ' + Chem.fhtml(f) + ' has ' + per + ' ' + Chem.NAMES[e] + ' atom' + (per > 1 ? 's' : '') + '. The coefficient ' + c + ' multiplies the whole formula: ' + per + ' &times; ' + c + ' = ' + per * c + '.' };
+  }
+
+  function qFormula() {
+    const [name, right, wrong, note] = pick([
+      ['carbon dioxide', 'CO2', ['CO', 'C2O', 'CO3'], 'Di means two, so one carbon and two oxygen.'],
+      ['sodium chloride', 'NaCl', ['NaCl2', 'SCl', 'Na2Cl'], 'The symbol for sodium is Na, and one sodium pairs with one chlorine.'],
+      ['water', 'H2O', ['HO2', 'H2O2', 'HO'], 'Water has two hydrogen atoms and one oxygen atom. H<sub>2</sub>O<sub>2</sub> is hydrogen peroxide.'],
+      ['ammonia', 'NH3', ['NH4', 'N3H', 'NO3'], 'Ammonia is one nitrogen and three hydrogen atoms.'],
+      ['methane', 'CH4', ['CH3', 'C4H', 'CH2'], 'Methane is one carbon atom joined to four hydrogen atoms.'],
+      ['magnesium oxide', 'MgO', ['MgO2', 'MnO', 'Mg2O'], 'Mg is magnesium. Mn is manganese, a different element.'],
+      ['calcium carbonate', 'CaCO3', ['CaCO2', 'CaO', 'Ca2CO3'], 'Carbonate is CO<sub>3</sub>, and one calcium goes with one carbonate.'],
+      ['sulfuric acid', 'H2SO4', ['HSO4', 'H2SO3', 'H2S'], 'Sulfuric acid contains a sulfate group, SO<sub>4</sub>, with two hydrogens.'],
+      ['oxygen gas', 'O2', ['O', 'O3', 'O4'], 'Oxygen is diatomic. O<sub>3</sub> is ozone, a different substance.']
+    ]);
+    const opts = [right].concat(wrong);
+    return { type: 'mcq', part: 2, label: 'Formula for ' + name,
+      q: 'What is the formula for <strong>' + name + '</strong>?',
+      options: opts.map(Chem.fhtml), answer: 0, explain: note };
+  }
+
+  function qSymbol() {
+    return pick([
+      { type: 'mcq', part: 2, label: 'Word to symbol equation',
+        q: 'Which symbol equation matches <span class="words">sodium + chlorine &rarr; sodium chloride</span>? (It does not need to be balanced yet.)',
+        options: ['Na + Cl<sub>2</sub> &rarr; NaCl', 'Na + Cl &rarr; NaCl', 'S + Cl<sub>2</sub> &rarr; SCl', 'Na + Cl<sub>2</sub> &rarr; NaCl<sub>2</sub>'],
+        answer: 0, explain: 'Chlorine is diatomic so it is Cl<sub>2</sub>, and sodium chloride is NaCl. Never change a formula to make atoms match.' },
+      { type: 'mcq', part: 2, label: 'Word to symbol equation',
+        q: 'Which symbol equation matches <span class="words">hydrogen + oxygen &rarr; water</span>? (It does not need to be balanced yet.)',
+        options: ['H<sub>2</sub> + O<sub>2</sub> &rarr; H<sub>2</sub>O', 'H + O &rarr; H<sub>2</sub>O', 'H<sub>2</sub> + O &rarr; H<sub>2</sub>O', 'H<sub>2</sub> + O<sub>2</sub> &rarr; H<sub>2</sub>O<sub>2</sub>'],
+        answer: 0, explain: 'Hydrogen and oxygen are both diatomic. H<sub>2</sub>O<sub>2</sub> is hydrogen peroxide, not water.' },
+      { type: 'mcq', part: 2, label: 'Word to symbol equation',
+        q: 'Which symbol equation matches <span class="words">magnesium + oxygen &rarr; magnesium oxide</span>? (It does not need to be balanced yet.)',
+        options: ['Mg + O<sub>2</sub> &rarr; MgO', 'Mn + O<sub>2</sub> &rarr; MnO', 'Mg + O &rarr; MgO', 'Mg + O<sub>2</sub> &rarr; MgO<sub>2</sub>'],
+        answer: 0, explain: 'Magnesium is Mg, oxygen gas is O<sub>2</sub> and magnesium oxide is MgO.' }
+    ]);
+  }
+
+  function qProducts() {
+    const s = pick([
+      { r: 'zinc + sulfuric acid', a: 'zinc sulfate + hydrogen', w: ['zinc oxide + water', 'zinc sulfate + water', 'zinc + hydrogen sulfate'], why: 'metal + acid &rarr; salt + hydrogen. Sulfuric acid makes sulfate salts.' },
+      { r: 'magnesium + hydrochloric acid', a: 'magnesium chloride + hydrogen', w: ['magnesium chloride + water', 'magnesium oxide + chlorine', 'magnesium hydroxide + chlorine'], why: 'metal + acid &rarr; salt + hydrogen. Hydrochloric acid makes chloride salts.' },
+      { r: 'sodium hydroxide + hydrochloric acid', a: 'sodium chloride + water', w: ['sodium chloride + hydrogen', 'sodium oxide + water', 'sodium + chlorine + water'], why: 'acid + metal hydroxide &rarr; salt + water.' },
+      { r: 'calcium carbonate + nitric acid', a: 'calcium nitrate + water + carbon dioxide', w: ['calcium nitrate + hydrogen', 'calcium oxide + nitrogen', 'calcium carbonate + water'], why: 'acid + metal carbonate &rarr; salt + water + carbon dioxide. Nitric acid makes nitrate salts.' },
+      { r: 'propane + oxygen', a: 'carbon dioxide + water', w: ['carbon + hydrogen', 'propane oxide', 'carbon dioxide + hydrogen'], why: 'When a fuel made of carbon and hydrogen burns completely it makes carbon dioxide and water.' }
+    ]);
+    return { type: 'mcq', part: 2, label: 'Predict the products',
+      q: 'What are the products? <span class="words">' + s.r + ' &rarr; ?</span>',
+      options: [s.a].concat(s.w), answer: 0, explain: s.why };
+  }
+
+  function qAnatomy() {
+    return pick([
+      { type: 'mcq', part: 2, label: 'State symbols',
+        q: 'What does the state symbol <strong>(aq)</strong> mean?',
+        options: ['Dissolved in water', 'A liquid', 'A gas', 'A solid in water'], answer: 0,
+        explain: 'Aqueous means dissolved in water. A pure liquid, such as water itself, is (l).' },
+      { type: 'mcq', part: 2, label: 'Coefficients',
+        q: 'In <span class="eq-inline">3H<sub>2</sub>O</span>, what does the 3 tell you?',
+        options: ['There are three water particles', 'There are three hydrogen atoms', 'There are three oxygen atoms in one particle', 'The water is in its third state'], answer: 0,
+        explain: 'A coefficient counts whole particles. 3H<sub>2</sub>O is three water particles, with 6 hydrogen and 3 oxygen atoms altogether.' },
+      { type: 'mcq', part: 2, label: 'Diatomic elements',
+        q: 'Which of these elements is <strong>not</strong> diatomic?',
+        options: ['Sodium', 'Nitrogen', 'Chlorine', 'Hydrogen'], answer: 0,
+        explain: 'The seven diatomic elements are H, O, F, Br, I, N and Cl. Sodium is written as Na on its own.' },
+      { type: 'mcq', part: 2, label: 'Subscripts',
+        q: 'In <span class="eq-inline">CO<sub>2</sub></span>, what does the small 2 tell you?',
+        options: ['Each particle has two oxygen atoms', 'There are two carbon dioxide particles', 'There are two carbon atoms', 'The whole formula is doubled'], answer: 0,
+        explain: 'A subscript counts the atom just before it, inside one particle.' }
+    ]);
+  }
+
+  /* ================= Part 3: balancing ================= */
+
+  function eqPick(level, avoid) {
+    const pool = BANK[level].filter(e => e.name !== 'Check before you change' && !(avoid || []).includes(e.name));
+    return pick(pool);
+  }
+
+  function qBalance(level, used) {
+    const eq = eqPick(level, used);
+    used.push(eq.name);
+    return { type: 'balance', part: 3, label: 'Balance: ' + eq.name, eq };
+  }
+
+  function qMistake(used) {
+    const kind = pick(['correct', 'unbalanced', 'simplest', 'subscript']);
+    let eq, coefs, task, why;
+    if (kind === 'subscript') {
+      const s = pick([
+        { task: 'hydrogen + oxygen &rarr; water', eq: { reactants: ['H2', 'O2'], products: ['H2O2'] }, c: [1, 1, 1], fix: 'H<sub>2</sub>O<sub>2</sub> is hydrogen peroxide. The formula for water must stay H<sub>2</sub>O, so the answer is 2H<sub>2</sub> + O<sub>2</sub> &rarr; 2H<sub>2</sub>O.' },
+        { task: 'magnesium + oxygen &rarr; magnesium oxide', eq: { reactants: ['Mg', 'O2'], products: ['MgO2'] }, c: [1, 1, 1], fix: 'Magnesium oxide is MgO. The answer is 2Mg + O<sub>2</sub> &rarr; 2MgO.' },
+        { task: 'sodium + chlorine &rarr; sodium chloride', eq: { reactants: ['Na', 'Cl2'], products: ['NaCl2'] }, c: [1, 1, 1], fix: 'Sodium chloride is NaCl. The answer is 2Na + Cl<sub>2</sub> &rarr; 2NaCl.' }
+      ]);
+      eq = s.eq; coefs = s.c; task = s.task; why = s.fix;
+    } else {
+      const src = eqPick(pick([1, 2]), used.concat(BANK[1].concat(BANK[2]).filter(e => e.answer.every(x => x === 1)).map(e => e.name)));
+      eq = src; task = src.words;
+      if (kind === 'correct') {
+        coefs = src.answer.slice();
+        why = 'Every element has the same number of atoms on both sides, and the coefficients are the lowest whole numbers.';
+      } else if (kind === 'simplest') {
+        coefs = src.answer.map(x => x * 2);
+        why = 'The atoms match, but every coefficient can be halved. The answer is ' + Chem.equationHTML(src, src.answer) + '.';
+      } else {
+        do {
+          coefs = src.answer.slice();
+          const k = randInt(0, coefs.length - 1);
+          coefs[k] = coefs[k] > 1 && Math.random() < 0.5 ? coefs[k] - 1 : coefs[k] + 1;
+        } while (Chem.status(src, coefs).balanced);
+        const off = Chem.status(src, coefs).rows.filter(r => r.left !== r.right).map(r => Chem.NAMES[r.el]);
+        why = 'Count again: ' + off.join(' and ') + ' do' + (off.length === 1 ? 'es' : '') + ' not match. The answer is ' + Chem.equationHTML(src, src.answer) + '.';
+      }
+    }
+    const verdicts = ['Correct', 'A subscript was changed', 'Not balanced', 'Balanced, but not the lowest numbers'];
+    const answer = { correct: 0, subscript: 1, unbalanced: 2, simplest: 3 }[kind];
+    return { type: 'mcq', part: 3, label: 'Spot the mistake', keepOrder: true,
+      q: 'A student was asked to balance <span class="words">' + task + '</span>. They wrote:<div class="student-work"><p class="eq">' + Chem.equationHTML(eq, coefs) + '</p></div>What is your verdict?',
+      options: verdicts, answer, explain: why };
+  }
+
+  function qWhichSet(used) {
+    const eq = eqPick(2, used);
+    used.push(eq.name);
+    const right = eq.answer;
+    const opts = [right.join(',')];
+    const doubled = right.map(x => x * 2);
+    const cands = [doubled, right.map(() => 1)];
+    for (let t = 0; t < 30 && cands.length < 8; t++) {
+      const c = right.slice();
+      const k = randInt(0, c.length - 1);
+      c[k] = Math.max(1, c[k] + pick([-1, 1, 2]));
+      cands.push(c);
+    }
+    cands.forEach(c => {
+      const key = c.join(',');
+      if (opts.length < 4 && !opts.includes(key) && !(Chem.status(eq, c).balanced && c.join() !== doubled.join())) opts.push(key);
+    });
+    const parts = opts.map(k => Chem.equationHTML(eq, k.split(',').map(Number)));
+    return { type: 'mcq', part: 3, label: 'Choose the balanced equation',
+      q: 'Which is the correct balanced equation for <span class="words">' + eq.words + '</span>?',
+      options: parts, answer: 0,
+      explain: 'Count each element on both sides. Only ' + parts[0] + ' matches for every element <em>and</em> uses the lowest whole numbers.' };
+  }
+
+  /* ================= Build a set ================= */
+
+  function buildSet() {
+    const used = [];
+    return [
+      qLaw(), qPredict(), qMassClosed(), qMassOpen(), qExplain(),
+      qFormula(), qSymbol(), qAtoms(), qProducts(), qAnatomy(),
+      qBalance(1, used), qBalance(2, used), qWhichSet(used), qBalance(3, used), qMistake(used)
+    ];
+  }
+
+  /* ================= Runner ================= */
+
+  let set, idx, score, results, startTime;
+  const $ = id => document.getElementById(id);
+  const qBox = $('qBox');
+
+  const best = Progress.get('finalBest', null);
+  if (best) $('bestLine').textContent = 'Your best score so far on this device: ' + best.score + ' out of 15.';
+
+  function start() {
+    set = buildSet(); idx = 0; score = 0; results = []; startTime = Date.now();
+    $('intro').hidden = true; $('results').hidden = true; $('run').hidden = false;
+    show();
+    $('run').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function bar() {
+    $('num').textContent = Math.min(idx + 1, 15);
+    $('score').textContent = score;
+    $('meter').style.width = (idx / set.length * 100) + '%';
+  }
+
+  function record(ok, q) {
+    if (ok) score++;
+    results.push({ part: q.part, ok, label: q.label });
+    bar();
+  }
+
+  function show() {
+    bar();
+    const q = set[idx];
+    qBox.innerHTML = '';
+    const fb = el('div', { class: 'feedback', hidden: '' });
+    const next = el('button', { type: 'button', class: 'btn btn-primary', hidden: '', text: idx + 1 < set.length ? 'Next question' : 'See my results' });
+    next.addEventListener('click', () => { idx++; idx < set.length ? show() : finish(); });
+
+    qBox.append(el('span', { class: 'fc-part-tag p' + q.part, text: 'Part ' + q.part + ': ' + PART_NAMES[q.part] }));
+
+    function reveal(ok, html) {
+      record(ok, q);
+      fb.hidden = false;
+      fb.className = 'feedback ' + (ok ? 'good' : 'bad');
+      fb.innerHTML = '<strong>' + (ok ? 'Correct.' : 'Not this time.') + '</strong> ' + html;
+      next.hidden = false;
+      next.focus();
+    }
+
+    if (q.type === 'mcq') {
+      const order = q.keepOrder ? q.options.map((_, i) => i) : shuffle(q.options.map((_, i) => i));
+      const list = el('div', { class: 'options' });
+      order.forEach(oi => list.append(el('button', { type: 'button', class: 'option', html: q.options[oi], onclick: e => {
+        const ok = oi === q.answer;
+        [...list.children].forEach(b => { b.disabled = true; });
+        e.currentTarget.classList.add(ok ? 'is-right' : 'is-wrong');
+        if (!ok) list.children[order.indexOf(q.answer)].classList.add('is-right');
+        reveal(ok, q.explain);
+      } })));
+      qBox.append(el('div', { class: 'fc-q', html: q.q }), list);
+    }
+
+    if (q.type === 'number') {
+      const input = el('input', { type: 'text', inputmode: 'decimal', autocomplete: 'off', 'aria-label': 'Your answer in ' + q.unit });
+      const check = el('button', { type: 'button', class: 'btn btn-primary', text: 'Check' });
+      const tip = el('p', { class: 'small', 'aria-live': 'polite' });
+      const doCheck = () => {
+        const val = parseFloat(String(input.value).replace(',', '.').replace(/[^0-9.\-]/g, ''));
+        if (isNaN(val)) { tip.textContent = 'Type a number first, for example ' + (q.whole ? '6' : '12.5') + '.'; input.focus(); return; }
+        tip.textContent = '';
+        const ok = Math.abs(val - q.answer) < (q.whole ? 0.01 : 0.051);
+        input.disabled = true; check.disabled = true;
+        input.classList.add(ok ? 'is-right' : 'is-wrong');
+        reveal(ok, (ok ? '' : 'The answer is ' + (q.whole ? q.answer : g(q.answer)) + '. ') + q.explain);
+      };
+      check.addEventListener('click', doCheck);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') doCheck(); });
+      qBox.append(el('div', { class: 'fc-q', html: q.q }),
+        el('div', { class: 'btn-row' }, [el('span', { class: 'field' }, [input, el('span', { text: q.unit })]), check]), tip);
+    }
+
+    if (q.type === 'balance') {
+      const eq = q.eq;
+      const coefs = eq.reactants.concat(eq.products).map(() => 1);
+      const holder = el('div', { class: 'fc-eq' });
+      const steppers = [];
+      eq.reactants.concat(eq.products).forEach((f, k) => {
+        if (k > 0) holder.append(el('span', { class: 'op', html: k === eq.reactants.length ? '&rarr;' : '+' }));
+        const st = stepper(f, k);
+        steppers.push(st);
+        holder.append(el('span', { class: 'lab-term' }, [st.node, el('span', { class: 'lab-formula', html: Chem.fhtml(f) })]));
+      });
+      function stepper(f, k) { return Lesson.stepper({ value: 1, min: 1, max: 15, label: 'coefficient of ' + f, onChange: v => { coefs[k] = v; } }); }
+      const check = el('button', { type: 'button', class: 'btn btn-primary', text: 'Check' });
+      check.addEventListener('click', () => {
+        const s = Chem.status(eq, coefs);
+        const ok = s.balanced && s.simplest;
+        check.disabled = true;
+        steppers.forEach(st => st.node.querySelectorAll('button').forEach(b => { b.disabled = true; }));
+        let msg;
+        if (ok) msg = 'Every element matches with the lowest whole numbers.';
+        else if (s.balanced) msg = 'The atoms match, but every coefficient can be divided by ' + s.divisor + '. The answer is <span class="eq-inline">' + Chem.equationHTML(eq, eq.answer) + '</span>.';
+        else {
+          const off = s.rows.filter(r => r.left !== r.right).map(r => Chem.NAMES[r.el] + ' (' + r.left + ' on the left, ' + r.right + ' on the right)');
+          msg = 'These did not match: ' + off.join(', ') + '. The answer is <span class="eq-inline">' + Chem.equationHTML(eq, eq.answer) + '</span>.';
+        }
+        reveal(ok, msg);
+      });
+      qBox.append(el('div', { class: 'fc-q', html: 'Balance this equation. <span class="words">' + eq.words + '</span>' }),
+        holder, el('div', { class: 'btn-row' }, [check]));
+    }
+
+    qBox.append(fb, el('div', { class: 'btn-row' }, [next]));
+  }
+
+  function finish() {
+    idx = set.length; bar();
+    $('run').hidden = true;
+    const box = $('results');
+    box.hidden = false; box.innerHTML = '';
+
+    const mins = Math.max(1, Math.round((Date.now() - startTime) / 60000));
+    const byPart = [1, 2, 3].map(p => results.filter(r => r.part === p && r.ok).length);
+    const now = new Date();
+    const dateText = now.toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + ', ' + now.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' });
+
+    const prevBest = Progress.get('finalBest', null);
+    if (!prevBest || score > prevBest.score) Progress.set('finalBest', { score, date: now.toISOString() });
+
+    const nameInput = el('input', { type: 'text', autocomplete: 'name', placeholder: 'Type your name', 'aria-label': 'Your name', value: Progress.get('studentName', '') });
+    const nameShow = el('strong', { text: Progress.get('studentName', '') || '________________' });
+    nameInput.addEventListener('input', () => { Progress.set('studentName', nameInput.value.trim()); nameShow.textContent = nameInput.value.trim() || '________________'; });
+
+    const LINKS = {
+      1: ['mass-detective', 'mass-maths'],
+      2: ['atom-counter', 'formula-match'],
+      3: ['balancing-lab', 'spot-the-mistake']
+    };
+    const weak = [1, 2, 3].filter(p => byPart[p - 1] <= 3);
+    const actLink = id => { const a = ACTIVITIES.find(x => x.id === id); return '<a href="' + a.file + '">' + a.title + '</a>'; };
+
+    let message;
+    if (score === 15) message = '<strong>A perfect score.</strong> You can explain conservation of mass, write equations and balance them. Excellent work.';
+    else if (score >= 12) message = '<strong>Strong result.</strong> You have a good grip on the whole lesson.';
+    else if (score >= 8) message = '<strong>Solid start.</strong> A bit more practice will lock it in.';
+    else message = '<strong>Keep practising.</strong> Go back over the activities below, then try a new set of questions.';
+
+    const review = el('ol', { class: 'review-list' });
+    results.forEach(r => review.append(el('li', null, [
+      el('span', { class: r.ok ? 'ok' : 'no', text: r.ok ? '\u2713' : '\u2717', 'aria-label': r.ok ? 'correct' : 'incorrect' }),
+      el('span', { html: '<span class="fc-part-tag p' + r.part + '" style="margin:0 0.4rem 0 0">P' + r.part + '</span>' + r.label })
+    ])));
+
+    box.append(
+      el('p', { class: 'cert-name no-print' }, [el('label', null, [document.createTextNode('Your name for the summary: '), nameInput])]),
+      el('div', { class: 'certificate' }, [
+        el('div', { class: 'cert-head' }, [
+          el('div', null, [
+            el('p', { class: 'small', text: 'Year 9 Chemistry, Seaford Secondary College' }),
+            el('h2', { text: 'Final challenge results' })
+          ]),
+          el('p', { class: 'cert-score', html: score + ' <small>out of 15</small>' })
+        ]),
+        el('p', null, [document.createTextNode('Student: '), nameShow]),
+        el('p', { class: 'small', text: 'Completed ' + dateText + ', in about ' + mins + (mins === 1 ? ' minute.' : ' minutes.') }),
+        el('div', { class: 'cert-parts' }, [1, 2, 3].map(p => el('div', null, [
+          el('span', { class: 'small', text: 'Part ' + p + ': ' + PART_NAMES[p] }), el('b', { text: byPart[p - 1] + ' / 5' })
+        ]))),
+        el('div', { class: 'feedback ' + (score >= 12 ? 'good' : 'info'), html: message }),
+        el('h3', { text: 'Question by question', style: 'font-size: var(--step-1); margin-top: 1.2rem;' }),
+        review
+      ]),
+      weak.length ? el('div', { class: 'callout tip no-print', html: '<p><strong>Worth another look:</strong> ' +
+        weak.map(p => 'for ' + PART_NAMES[p].toLowerCase() + ', try ' + LINKS[p].map(actLink).join(' and ')).join('; ') + '.</p>' }) : null,
+      el('div', { class: 'btn-row no-print' }, [
+        el('button', { type: 'button', class: 'btn btn-primary', text: 'Print or save as PDF', onclick: () => window.print() }),
+        el('button', { type: 'button', class: 'btn', text: 'Try a new set of questions', onclick: start })
+      ]),
+      el('p', { class: 'small no-print', text: 'Show this summary to your teacher, or print it and hand it in.' })
+    );
+    Progress.markDone('final-challenge');
+    box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  $('startBtn').addEventListener('click', start);
+})();
+</script>
+</body>
+</html>

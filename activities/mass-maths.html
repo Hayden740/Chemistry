@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mass maths | Year 9 Chemistry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-activity="mass-maths">
+<main class="narrow">
+  <div class="page-head">
+    <h1>Mass maths</h1>
+    <p class="lede">If mass is never lost, you can work out a missing mass with simple addition and subtraction.</p>
+  </div>
+
+  <h2 class="section-title">How it works</h2>
+  <div class="callout law"><p><strong>Total mass of reactants = total mass of products</strong></p></div>
+
+  <div class="worked">
+    <h3>Worked example 1</h3>
+    <p class="words">hydrogen + oxygen &rarr; water</p>
+    <p>4.0 g of hydrogen reacts completely with 32.0 g of oxygen. What mass of water is made?</p>
+    <ol class="work-lines">
+      <li>Add up the reactants: 4.0 g + 32.0 g = 36.0 g</li>
+      <li>Mass is conserved, so the products must also total 36.0 g.</li>
+      <li>Water is the only product, so <strong>36.0 g of water</strong> is made.</li>
+    </ol>
+  </div>
+  <div class="worked">
+    <h3>Worked example 2</h3>
+    <p class="words">calcium carbonate &rarr; calcium oxide + carbon dioxide</p>
+    <p>10.0 g of calcium carbonate is heated in a closed system. It makes 5.6 g of calcium oxide. What mass of carbon dioxide is made?</p>
+    <ol class="work-lines">
+      <li>Total of the reactants: 10.0 g</li>
+      <li>The products must total 10.0 g too.</li>
+      <li>10.0 g &minus; 5.6 g = <strong>4.4 g of carbon dioxide</strong></li>
+    </ol>
+  </div>
+  <div class="worked">
+    <h3>Worked example 3: an open system</h3>
+    <p>An open flask of acid and marble chips reads 150.0 g on a balance. When the fizzing stops it reads 148.2 g. What mass of carbon dioxide escaped?</p>
+    <ol class="work-lines">
+      <li>The mass that left the flask is the difference between the readings.</li>
+      <li>150.0 g &minus; 148.2 g = <strong>1.8 g of carbon dioxide</strong> escaped.</li>
+    </ol>
+  </div>
+
+  <h2 class="section-title">Your turn</h2>
+  <p>Get <strong>8 correct</strong> to complete this activity. Keep going after that for extra practice. Answer to one decimal place.</p>
+
+  <section class="panel" aria-live="polite">
+    <div class="scorebar">
+      <span>Correct <b id="correct">0</b> / 8</span>
+      <span>Streak <b id="streak">0</b></span>
+      <span>Best streak <b id="best">0</b></span>
+    </div>
+    <div class="meter"><span id="meter"></span></div>
+    <div id="question"></div>
+  </section>
+</main>
+
+<script src="../js/lesson.js"></script>
+<script>
+(function () {
+  const { el, pick, randInt, round1, Progress } = Lesson;
+  const GOAL = 8;
+
+  // Relative masses keep every question chemically realistic.
+  const REACTIONS = [
+    { text: 'Magnesium ribbon reacts completely with oxygen in a closed container.', r: [['magnesium', 24.3], ['oxygen', 16.0]], p: [['magnesium oxide', 40.3]] },
+    { text: 'Iron filings are heated with sulfur in a sealed tube.', r: [['iron', 55.8], ['sulfur', 32.1]], p: [['iron sulfide', 87.9]] },
+    { text: 'Hydrogen gas burns in oxygen inside a sealed container.', r: [['hydrogen', 4.0], ['oxygen', 32.0]], p: [['water', 36.0]] },
+    { text: 'Carbon burns completely in oxygen in a closed vessel.', r: [['carbon', 12.0], ['oxygen', 32.0]], p: [['carbon dioxide', 44.0]] },
+    { text: 'Copper is heated in a sealed tube containing oxygen.', r: [['copper', 127.0], ['oxygen', 32.0]], p: [['copper oxide', 159.0]] },
+    { text: 'Sodium burns in chlorine gas in a sealed flask.', r: [['sodium', 46.0], ['chlorine', 71.0]], p: [['sodium chloride', 117.0]] },
+    { text: 'Calcium carbonate is heated strongly in a closed system and breaks down.', r: [['calcium carbonate', 100.0]], p: [['calcium oxide', 56.0], ['carbon dioxide', 44.0]] },
+    { text: 'Copper carbonate is heated in a closed system and breaks down.', r: [['copper carbonate', 123.5]], p: [['copper oxide', 79.5], ['carbon dioxide', 44.0]] },
+    { text: 'Hydrogen peroxide breaks down inside a sealed bottle.', r: [['hydrogen peroxide', 68.0]], p: [['water', 36.0], ['oxygen', 32.0]] },
+    { text: 'Methane burns in oxygen inside a sealed container.', r: [['methane', 16.0], ['oxygen', 64.0]], p: [['carbon dioxide', 44.0], ['water', 36.0]] },
+    { text: 'Marble chips react with hydrochloric acid in a sealed flask.', r: [['calcium carbonate', 100.0], ['hydrochloric acid', 73.0]], p: [['calcium chloride', 111.0], ['water', 18.0], ['carbon dioxide', 44.0]] },
+    { text: 'Sodium hydroxide solution neutralises hydrochloric acid in a beaker.', r: [['sodium hydroxide', 40.0], ['hydrochloric acid', 36.5]], p: [['sodium chloride', 58.5], ['water', 18.0]] }
+  ];
+
+  let correct = Progress.get('massMathsCorrect', 0), streak = 0, best = 0;
+  const qBox = document.getElementById('question');
+  const sum = arr => round1(arr.reduce((a, b) => a + b, 0));
+  const g = n => n.toFixed(1) + ' g';
+
+  function makeClosed() {
+    const rx = pick(REACTIONS);
+    const first = randInt(20, 300) / 10;
+    const s = first / rx.r[0][1];
+    const species = rx.r.map(x => ({ name: x[0], mass: round1(x[1] * s), side: 'r' }))
+      .concat(rx.p.map(x => ({ name: x[0], mass: round1(x[1] * s), side: 'p' })));
+    // Make the two sides agree exactly after rounding by adjusting the last product
+    const rTot = sum(species.filter(x => x.side === 'r').map(x => x.mass));
+    const prods = species.filter(x => x.side === 'p');
+    prods[prods.length - 1].mass = round1(rTot - sum(prods.slice(0, -1).map(x => x.mass)));
+
+    const unknown = pick(species);
+    const known = species.filter(x => x !== unknown);
+    const otherSide = known.filter(x => x.side !== unknown.side);
+    const sameSide = known.filter(x => x.side === unknown.side);
+    const total = sum(otherSide.map(x => x.mass));
+    const answer = round1(total - sum(sameSide.map(x => x.mass)));
+
+    const sideName = unknown.side === 'r' ? 'products' : 'reactants';
+    const work = [
+      'Mass is conserved, so the total mass of reactants equals the total mass of products.',
+      'Add up the ' + sideName + ': ' + otherSide.map(x => g(x.mass)).join(' + ') + ' = ' + g(total)
+    ];
+    if (sameSide.length) work.push('Take away what you already know on the other side: ' + g(total) + ' \u2212 ' + sameSide.map(x => g(x.mass)).join(' \u2212 ') + ' = ' + g(answer));
+    work.push('So the mass of ' + unknown.name + ' is ' + g(answer) + '.');
+
+    return { kind: 'closed', rx, species, unknown, answer, work,
+      prompt: 'What mass of ' + unknown.name + (unknown.side === 'r' ? ' reacted?' : ' was made?') };
+  }
+
+  function makeOpen() {
+    const type = randInt(0, 2);
+    if (type === 0) {
+      const before = randInt(1200, 2600) / 10, loss = randInt(6, 45) / 10, after = round1(before - loss);
+      return { kind: 'open', text: 'An open flask containing marble chips and hydrochloric acid sits on a balance. At the start it reads ' + g(before) + '. When the fizzing stops it reads ' + g(after) + '.',
+        prompt: 'What mass of carbon dioxide escaped?', answer: loss,
+        work: ['The gas escaped from an open system, so the drop in the reading is the mass of gas.', g(before) + ' \u2212 ' + g(after) + ' = ' + g(loss)] };
+    }
+    if (type === 1) {
+      const before = randInt(250, 450) / 10, gain = randInt(3, 25) / 10, after = round1(before + gain);
+      return { kind: 'open', text: 'A crucible with magnesium ribbon inside weighs ' + g(before) + '. The magnesium is heated in air until it all turns to white powder. The crucible now weighs ' + g(after) + '.',
+        prompt: 'What mass of oxygen from the air joined the magnesium?', answer: gain,
+        work: ['Oxygen from the air joined in, so the increase is the mass of oxygen.', g(after) + ' \u2212 ' + g(before) + ' = ' + g(gain)] };
+    }
+    const before = randInt(900, 1800) / 10, loss = randInt(5, 30) / 10, after = round1(before - loss);
+    return { kind: 'open', text: 'A beaker of vinegar and baking soda reads ' + g(before) + ' at the start. The reaction is left open, and ' + g(loss) + ' of carbon dioxide escapes into the air.',
+      prompt: 'What will the balance read at the end?', answer: after,
+      work: ['The escaped gas is no longer on the balance, so subtract it from the starting reading.', g(before) + ' \u2212 ' + g(loss) + ' = ' + g(after)] };
+  }
+
+  function render() {
+    const q = Math.random() < 0.72 ? makeClosed() : makeOpen();
+    let tries = 0;
+    qBox.innerHTML = '';
+    const input = el('input', { type: 'text', inputmode: 'decimal', autocomplete: 'off', 'aria-label': 'Your answer in grams' });
+    const fb = el('div', { class: 'feedback', hidden: '' });
+    const check = el('button', { type: 'button', class: 'btn btn-primary', text: 'Check' });
+    const next = el('button', { type: 'button', class: 'btn', text: 'Next question', hidden: '' });
+    const hintBtn = el('button', { type: 'button', class: 'btn btn-quiet', text: 'Show a hint' });
+
+    if (q.kind === 'closed') {
+      const words = q.rx.r.map(x => x[0]).join(' + ') + ' &rarr; ' + q.rx.p.map(x => x[0]).join(' + ');
+      const cell = sp => sp === q.unknown
+        ? el('td', { class: 'mass-cell' }, [el('span', { class: 'field' }, [input, el('span', { text: 'g' })])])
+        : el('td', { class: 'mass-cell', text: g(sp.mass) });
+      const rows = sideList => sideList.map(sp => el('tr', null, [el('td', { text: sp.name }), cell(sp)]));
+      const rs = q.species.filter(x => x.side === 'r'), ps = q.species.filter(x => x.side === 'p');
+      qBox.append(
+        el('p', { class: 'words eq-words', html: words }),
+        el('p', { text: q.rx.text }),
+        el('div', { class: 'mass-sheet' }, [
+          el('table', { class: 'plain' }, [el('thead', null, [el('tr', null, [el('th', { text: 'Reactant' }), el('th', { text: 'Mass' })])]), el('tbody', null, rows(rs))]),
+          el('span', { class: 'big-arrow', html: '&rarr;', 'aria-hidden': 'true' }),
+          el('table', { class: 'plain' }, [el('thead', null, [el('tr', null, [el('th', { text: 'Product' }), el('th', { text: 'Mass' })])]), el('tbody', null, rows(ps))])
+        ]),
+        el('p', { class: 'q-prompt', text: q.prompt })
+      );
+    } else {
+      qBox.append(
+        el('p', { text: q.text }),
+        el('p', { class: 'q-prompt', text: q.prompt }),
+        el('p', null, [el('span', { class: 'field' }, [input, el('span', { text: 'g' })])])
+      );
+    }
+
+    const workList = () => '<ol class="work-lines">' + q.work.map(w => '<li>' + w + '</li>').join('') + '</ol>';
+
+    function doCheck() {
+      const val = parseFloat(String(input.value).replace(',', '.').replace(/[^0-9.\-]/g, ''));
+      if (isNaN(val)) { fb.hidden = false; fb.className = 'feedback info'; fb.innerHTML = 'Type a number, for example 12.5'; input.focus(); return; }
+      tries++;
+      const ok = Math.abs(val - q.answer) < 0.051;
+      fb.hidden = false;
+      if (ok) {
+        input.className = 'is-right';
+        correct++; streak++; best = Math.max(best, streak);
+        Progress.set('massMathsCorrect', correct);
+        fb.className = 'feedback good';
+        fb.innerHTML = '<strong>Correct, ' + g(q.answer) + '.</strong>' + workList();
+        finishQ();
+        if (correct >= GOAL) Progress.markDone('mass-maths');
+      } else if (tries === 1) {
+        input.className = 'is-wrong';
+        fb.className = 'feedback bad';
+        fb.innerHTML = '<strong>Not yet.</strong> ' + (q.kind === 'closed'
+          ? 'Start with the side where you know every mass. Add it up. The other side must have the same total.'
+          : 'Think about what got in or out of the system. The change in the reading is the mass of gas.') + ' Try again.';
+        input.select();
+      } else {
+        input.className = 'is-wrong';
+        streak = 0;
+        fb.className = 'feedback bad';
+        fb.innerHTML = '<strong>The answer is ' + g(q.answer) + '.</strong> Here is the working:' + workList();
+        finishQ();
+      }
+      updateScore();
+    }
+    function finishQ() { input.disabled = true; check.hidden = true; hintBtn.hidden = true; next.hidden = false; next.focus(); }
+
+    check.addEventListener('click', doCheck);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') doCheck(); });
+    next.addEventListener('click', render);
+    hintBtn.addEventListener('click', () => {
+      fb.hidden = false; fb.className = 'feedback info';
+      fb.innerHTML = '<strong>Hint:</strong> ' + q.work[0];
+    });
+
+    qBox.append(el('div', { class: 'btn-row' }, [check, hintBtn, next]), fb);
+    input.focus({ preventScroll: true });
+  }
+
+  function updateScore() {
+    document.getElementById('correct').textContent = correct;
+    document.getElementById('streak').textContent = streak;
+    document.getElementById('best').textContent = best;
+    document.getElementById('meter').style.width = Math.min(100, correct / GOAL * 100) + '%';
+  }
+
+  updateScore();
+  render();
+})();
+</script>
+</body>
+</html>

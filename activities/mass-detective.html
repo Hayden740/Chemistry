@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mass detective | Year 9 Chemistry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-activity="mass-detective">
+<main class="narrow">
+  <div class="page-head">
+    <h1>Mass detective</h1>
+    <p class="lede">Each experiment happens on a balance. Predict what the reading will do, then work out why.</p>
+  </div>
+
+  <div class="callout tip">
+    <p>Ask yourself two questions every time. <strong>Is the system open or sealed?</strong> <strong>Is a gas made or used up?</strong></p>
+  </div>
+
+  <section class="panel" id="game" aria-live="polite">
+    <div class="scorebar">
+      <span>Experiment <b id="num">1</b> of <b id="total">12</b></span>
+      <span>Points <b id="score">0</b></span>
+    </div>
+    <div class="meter"><span id="meter"></span></div>
+
+    <div id="card"></div>
+  </section>
+</main>
+
+<script src="../js/lesson.js"></script>
+<script>
+(function () {
+  const { el, shuffle, Progress } = Lesson;
+
+  const OUTCOMES = ['Goes up', 'Goes down', 'Stays the same'];
+  const CAUSES = ['A gas escaped into the air', 'A gas from the air joined in', 'Nothing got in or out'];
+
+  const SCENARIOS = [
+    { title: 'Fizzing tablet, open beaker', setup: 'open', before: 125.40, after: 124.62,
+      text: 'An antacid tablet is dropped into water in an open beaker. It fizzes until it has completely dissolved.',
+      outcome: 1, cause: 0, explain: 'The bubbles are carbon dioxide gas. In an open beaker the gas escapes into the air, so it is no longer weighed.' },
+    { title: 'Fizzing tablet, sealed bottle', setup: 'sealed', before: 142.10, after: 142.10,
+      text: 'The same antacid tablet is dropped into water in a plastic bottle, and the lid is screwed on straight away.',
+      outcome: 2, cause: 2, explain: 'Carbon dioxide is still made, but the lid traps it. Every atom stays on the balance, so the reading does not change.' },
+    { title: 'Burning steel wool', setup: 'open', before: 35.00, after: 35.90,
+      text: 'A ball of steel wool sits on a heatproof mat on the balance. It is lit and glows as it burns in the air.',
+      outcome: 0, cause: 1, explain: 'Oxygen from the air combines with the iron to make iron oxide. The product includes the mass of that oxygen.' },
+    { title: 'Mixing two clear solutions', setup: 'open', before: 210.35, after: 210.35,
+      text: 'Silver nitrate solution is poured into sodium chloride solution in an open beaker. A cloudy white solid forms.',
+      outcome: 2, cause: 2, explain: 'No gas is made or used. The atoms rearrange to form a solid, but they all stay in the beaker.' },
+    { title: 'Zinc in acid', setup: 'open', before: 180.20, after: 180.05,
+      text: 'Zinc granules are added to hydrochloric acid in an open conical flask. Bubbles form on the zinc.',
+      outcome: 1, cause: 0, explain: 'The bubbles are hydrogen gas, which escapes from the open flask. Hydrogen is very light, so the drop is small but real.' },
+    { title: 'Candle in a sealed jar', setup: 'sealed', before: 460.00, after: 460.00,
+      text: 'A small candle is lit inside a glass jar and the lid is sealed. The candle burns for a while and then goes out.',
+      outcome: 2, cause: 2, explain: 'Wax and oxygen react to make carbon dioxide and water vapour, but the gases are trapped inside the jar.' },
+    { title: 'Heating copper powder', setup: 'open', before: 22.50, after: 22.95,
+      text: 'Shiny copper powder is heated strongly in an open crucible. It slowly turns black.',
+      outcome: 0, cause: 1, explain: 'The black powder is copper oxide. Oxygen atoms from the air have joined onto the copper.' },
+    { title: 'Burning a log', setup: 'open', before: 2400.00, after: 60.00,
+      text: 'A log is burned completely in a fire pit sitting on a large scale. Only ash is left.',
+      outcome: 1, cause: 0, explain: 'Most of the atoms in the wood leave as carbon dioxide and water vapour. The mass has not been destroyed, it has floated away.' },
+    { title: 'Marble chips, sealed bottle', setup: 'sealed', before: 196.80, after: 196.80,
+      text: 'A few marble chips and some dilute acid are placed in a strong plastic bottle and the lid is tightened. The chips fizz.',
+      outcome: 2, cause: 2, explain: 'Carbon dioxide is made, but it cannot leave the sealed bottle, so the total mass stays the same.' },
+    { title: 'Rusting nail', setup: 'open', before: 5.60, after: 5.72,
+      text: 'An iron nail is left on a damp paper towel in an open dish for two weeks. It becomes covered in orange rust.',
+      outcome: 0, cause: 1, explain: 'Rust forms when iron reacts with oxygen and water from the air. Those atoms are now part of the nail.' },
+    { title: 'Melting ice', setup: 'sealed', before: 50.00, after: 50.00,
+      text: 'An ice cube in a sealed container melts into water.',
+      outcome: 2, cause: 2, explain: 'This is a physical change, not a chemical reaction, but mass is still conserved. The same water particles are there, just moving more freely.' },
+    { title: 'Baking soda and vinegar', setup: 'open', before: 98.50, after: 97.30,
+      text: 'A spoonful of baking soda is tipped into vinegar in an open cup. It foams up.',
+      outcome: 1, cause: 0, explain: 'The foam is full of carbon dioxide gas, which escapes from the open cup.' }
+  ];
+
+  const ICONS = {
+    open: '<svg viewBox="0 0 80 90" width="72" height="80" aria-hidden="true"><path d="M18 8 h44 M24 8 v18 L10 80 a4 4 0 0 0 4 5 h52 a4 4 0 0 0 4 -5 L56 26 V8" fill="#fff" stroke="#013148" stroke-width="3" stroke-linejoin="round"/><path d="M16 62 h48 l4 18 a3 3 0 0 1 -3 3 H15 a3 3 0 0 1 -3 -3 z" fill="#C0E7F8"/><path d="M40 0 v6 M30 2 l3 5 M50 2 l-3 5" stroke="#F46E63" stroke-width="3" stroke-linecap="round"/></svg>',
+    sealed: '<svg viewBox="0 0 80 90" width="72" height="80" aria-hidden="true"><rect x="28" y="2" width="24" height="12" rx="3" fill="#F46E63" stroke="#013148" stroke-width="3"/><path d="M30 14 v12 L12 44 a6 6 0 0 0 -2 4 V80 a5 5 0 0 0 5 5 h50 a5 5 0 0 0 5 -5 V48 a6 6 0 0 0 -2 -4 L50 26 V14" fill="#fff" stroke="#013148" stroke-width="3" stroke-linejoin="round"/><path d="M13 62 h54 v18 a3 3 0 0 1 -3 3 H16 a3 3 0 0 1 -3 -3 z" fill="#C0E7F8"/></svg>'
+  };
+
+  let order, idx, score;
+  const card = document.getElementById('card');
+
+  function fmt(n) { return n.toFixed(2) + ' g'; }
+
+  function start() {
+    order = shuffle(SCENARIOS);
+    idx = 0; score = 0;
+    document.getElementById('total').textContent = order.length;
+    show();
+  }
+
+  function updateBar() {
+    document.getElementById('num').textContent = Math.min(idx + 1, order.length);
+    document.getElementById('score').textContent = score + ' / ' + order.length * 2;
+    document.getElementById('meter').style.width = (idx / order.length * 100) + '%';
+  }
+
+  function optionRow(labels, onPick) {
+    const row = el('div', { class: 'options options-inline' });
+    labels.forEach((t, i) => row.append(el('button', { type: 'button', class: 'option', text: t, onclick: () => onPick(i, row) })));
+    return row;
+  }
+  function lock(row, chosen, right) {
+    [...row.children].forEach((b, i) => {
+      b.disabled = true;
+      if (i === right) b.classList.add('is-right');
+      else if (i === chosen) b.classList.add('is-wrong');
+    });
+  }
+
+  function show() {
+    updateBar();
+    const s = order[idx];
+    card.innerHTML = '';
+    const afterVal = el('b', { class: 'lcd', text: '? g' });
+    const setupLabel = s.setup === 'open' ? 'Open to the air' : 'Sealed';
+
+    card.append(
+      el('h2', { class: 'scenario-title', text: s.title }),
+      el('p', { text: s.text }),
+      el('div', { class: 'bench' }, [
+        el('div', { class: 'bench-vessel' }, [
+          el('span', { html: ICONS[s.setup] }),
+          el('span', { class: 'setup-tag setup-' + s.setup, text: setupLabel })
+        ]),
+        el('div', { class: 'balance' }, [
+          el('div', { class: 'balance-read' }, [el('span', { text: 'Before' }), el('b', { class: 'lcd', text: fmt(s.before) })]),
+          el('div', { class: 'balance-read' }, [el('span', { text: 'After' }), afterVal])
+        ])
+      ])
+    );
+
+    const qA = el('div', { class: 'step-q' }, [el('h3', { text: '1. What will the balance reading do?' })]);
+    const fbA = el('div', { class: 'feedback', hidden: '' });
+    const qB = el('div', { class: 'step-q', hidden: '' }, [el('h3', { text: '2. What caused that?' })]);
+    const fbB = el('div', { class: 'feedback', hidden: '' });
+    const nextBtn = el('button', { type: 'button', class: 'btn btn-primary', hidden: '', text: idx + 1 < order.length ? 'Next experiment' : 'See my result' });
+
+    const rowA = optionRow(OUTCOMES, (i, row) => {
+      lock(row, i, s.outcome);
+      const ok = i === s.outcome; if (ok) score++;
+      animateNumber(afterVal, s.before, s.after);
+      fbA.hidden = false;
+      fbA.className = 'feedback ' + (ok ? 'good' : 'bad');
+      fbA.innerHTML = '<strong>' + (ok ? 'Good prediction.' : 'Not this time.') + '</strong> The reading ' + OUTCOMES[s.outcome].toLowerCase() + ': ' + fmt(s.before) + ' before and ' + fmt(s.after) + ' after.';
+      qB.hidden = false;
+      updateBar();
+    });
+    qA.append(rowA, fbA);
+
+    const rowB = optionRow(CAUSES, (i, row) => {
+      lock(row, i, s.cause);
+      const ok = i === s.cause; if (ok) score++;
+      fbB.hidden = false;
+      fbB.className = 'feedback ' + (ok ? 'good' : 'bad');
+      fbB.innerHTML = '<strong>' + (ok ? 'Correct.' : 'Not quite.') + '</strong> ' + s.explain;
+      nextBtn.hidden = false;
+      nextBtn.focus();
+      updateBar();
+    });
+    qB.append(rowB, fbB);
+
+    nextBtn.addEventListener('click', () => { idx++; idx < order.length ? show() : finish(); });
+    card.append(qA, qB, el('div', { class: 'btn-row' }, [nextBtn]));
+  }
+
+  function animateNumber(node, from, to) {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || from === to) { node.textContent = fmt(to); return; }
+    const t0 = performance.now(), dur = 900;
+    function frame(t) {
+      const k = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - k, 3);
+      node.textContent = fmt(from + (to - from) * e);
+      if (k < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function finish() {
+    idx = order.length; updateBar();
+    const max = order.length * 2;
+    const pct = score / max;
+    card.innerHTML = '';
+    card.append(
+      el('h2', { class: 'scenario-title', text: 'Case closed' }),
+      el('p', { class: 'quiz-score', text: 'You scored ' + score + ' out of ' + max + '.' }),
+      el('div', { class: 'feedback ' + (pct >= 0.75 ? 'good' : 'info'), html: pct >= 0.75
+        ? '<strong>Sharp detective work.</strong> You can explain mass changes using open and closed systems.'
+        : '<strong>Keep going.</strong> Look back at the open and closed systems section of activity 1, then have another go.' }),
+      el('div', { class: 'callout law' }, [el('p', { html: 'Mass is <strong>always</strong> conserved. A balance reading only changes when a gas escapes or when a gas from the air joins in.' })]),
+      el('div', { class: 'btn-row' }, [el('button', { type: 'button', class: 'btn', text: 'Play again with a new order', onclick: start })])
+    );
+    Progress.markDone('mass-detective');
+  }
+
+  start();
+})();
+</script>
+</body>
+</html>
