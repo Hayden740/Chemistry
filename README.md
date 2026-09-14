@@ -1,38 +1,59 @@
-# Nothing lost, nothing made
+# Chemical Reactions Practice Test (Year 9 Science)
 
-An online lesson for Year 9 Chemistry at Seaford Secondary College on the law of conservation of mass, writing chemical equations and balancing equations (Australian Curriculum AC9S9U07).
+A self-contained practice test for the Chemical Reactions topic test. One HTML file, no build step, no accounts, no data leaves the student's browser.
 
-Students start on the landing page and work through 11 activities in three parts. Progress ticks are saved in the student's own browser, so nothing needs a login.
+Five sections, 50 marks, roughly 50 minutes:
 
-## Activities
+| Section | Type | Marks | Marked by |
+|---|---|---|---|
+| A | Multiple choice | 10 | the page |
+| B | Short answer | 14 | the student, against a model answer |
+| C | Balancing equations | 8 | the page |
+| D | Practical and data | 10 | mixed |
+| E | Extended response | 8 | the student, against a model answer |
 
-| Part | Activity | Type |
-| --- | --- | --- |
-| 1. Conservation of mass | Nothing is lost | Reading |
-| | Mass detective | Prediction |
-| | Mass maths | Practice |
-| 2. Writing equations | Anatomy of an equation | Reading |
-| | Formula match | Game |
-| | Word equation builder | Practice |
-| | Atom counter | Practice |
-| 3. Balancing equations | How to balance | Reading |
-| | Balancing lab | Practice |
-| | Spot the mistake | Error hunt |
-| | Final challenge | Challenge with printable results summary |
+Students work one section at a time and cannot go back. At the end they get a section breakdown, a total out of 50, and a four-character code to report.
 
-## Putting it online with GitHub Pages
+## Putting it on GitHub Pages
 
-1. Create a new public repository on GitHub, for example `Chemistry`.
-2. Upload everything in this folder, keeping the `activities`, `css` and `js` folders as they are. The hidden `.nojekyll` file should go up too.
-3. In the repository go to **Settings**, then **Pages**. Under **Build and deployment** choose **Deploy from a branch**, pick the `main` branch and the `/ (root)` folder, then save.
-4. After a minute or two the site will be live at `https://<your-username>.github.io/Chemistry/`.
+1. Create a repo (or use an existing one) and upload `index.html`, `README.md` and `.nojekyll`.
+2. Settings > Pages > Deploy from a branch > `main` > `/ (root)` > Save.
+3. The site appears at `https://<username>.github.io/<repo>/` within a minute or two.
 
-## Editing
+## Checking the codes
 
-There is no build step. Everything is plain HTML, CSS and JavaScript.
+The code is generated from the total score, so it cannot be invented backwards without this table. If a student reports a score and a code that do not match this table, the score has been edited.
 
-- `js/lesson.js` holds the activity list, progress saving and the chemistry helpers (formula parsing, atom tallies, particle drawings).
-- `js/equations.js` holds the 36 equations used in the Balancing lab and the Final challenge. Each has its answer coefficients, and every one has been checked to balance in lowest whole numbers.
-- `css/style.css` uses the Seaford 2025 palette.
+| Score | Code | Score | Code | Score | Code |
+|---|---|---|---|---|---|
+| 0 | FK29 | 17 | GH50 | 34 | HF71 |
+| 1 | LX42 | 18 | MV63 | 35 | NS84 |
+| 2 | RL55 | 19 | SJ76 | 36 | TG97 |
+| 3 | XY68 | 20 | YW89 | 37 | ZT10 |
+| 4 | DM81 | 21 | FK02 | 38 | GH23 |
+| 5 | KZ94 | 22 | LX15 | 39 | MV36 |
+| 6 | QN07 | 23 | RL28 | 40 | SJ49 |
+| 7 | WB20 | 24 | XY41 | 41 | YW62 |
+| 8 | CP33 | 25 | DM54 | 42 | FK75 |
+| 9 | JC46 | 26 | KZ67 | 43 | LX88 |
+| 10 | PQ59 | 27 | QN80 | 44 | RL01 |
+| 11 | VD72 | 28 | WB93 | 45 | XY14 |
+| 12 | BR85 | 29 | CP06 | 46 | DM27 |
+| 13 | HF98 | 30 | JC19 | 47 | KZ40 |
+| 14 | NS11 | 31 | PQ32 | 48 | QN53 |
+| 15 | TG24 | 32 | VD45 | 49 | WB66 |
+| 16 | ZT37 | 33 | BR58 | 50 | CP79 |
 
-Progress is stored in `localStorage` under the key `seaford-y9-equations-v1`. Students can clear their ticks from the link in the landing page footer.
+The code is a deterrent, not security. Anyone who opens the browser console can read the answers. Treat it as honest practice, not as an assessment you would put in a grade book.
+
+## Changing the questions
+
+All content lives in the `SECTIONS` array near the top of the `<script>` block in `index.html`. Each item has a type:
+
+- `mc` — `opts` array and `a` for the index of the correct option (counting from 0)
+- `bal` — `parts`, `prods`, and `a` as the list of coefficients in order, reactants first
+- `num` — `a` for the value, `tol` for the tolerance
+- `text` — `accept` as a list of acceptable lowercase answers
+- `self` and `essay` — `model` for the model answer and `guide` for the marking notes
+
+Marks come from each item's `m` value, so if you add or remove a question, update the section's `marks` value and the `/ 50` total in `setReadout` to match.

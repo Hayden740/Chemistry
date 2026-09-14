@@ -1,238 +1,670 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en-AU">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nothing lost, nothing made | Year 9 Chemistry</title>
-  <meta name="description" content="Year 9 online lesson on the law of conservation of mass, writing chemical equations and balancing them.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chemical Reactions Practice Test — Year 9 Science</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#013148;
+  --teal-mid:#0a4a68;
+  --lime:#BDD675;
+  --coral:#F46E63;
+  --pink:#F38C9F;
+  --sky:#C0E7F8;
+  --sage:#7AC698;
+  --paper:#F4FAFD;
+  --card:#ffffff;
+  --ink:#0d2a38;
+  --muted:#4a6b7c;
+  --rule:#d8e7ee;
+  --accent:var(--sky);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Atkinson Hyperlegible Next",system-ui,sans-serif;
+  font-size:17px;
+  line-height:1.55;
+}
+.wrap{max-width:56rem;margin:0 auto;padding:1.5rem 1.25rem 5rem}
+h1,h2,h3{line-height:1.2;margin:0}
+
+/* ---------- readout ---------- */
+.readout{
+  background:var(--teal);
+  border-radius:4px;
+  padding:1.1rem 1.25rem;
+  display:flex;
+  align-items:baseline;
+  gap:.9rem;
+  flex-wrap:wrap;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+}
+.readout .digits{
+  font-family:"DM Mono",ui-monospace,monospace;
+  font-size:clamp(2.4rem,9vw,3.6rem);
+  font-weight:500;
+  color:var(--lime);
+  letter-spacing:.02em;
+}
+.readout .unit{
+  font-family:"DM Mono",ui-monospace,monospace;
+  color:var(--sky);
+  font-size:1.05rem;
+}
+.readout .tag{
+  margin-left:auto;
+  color:#9dc4d6;
+  font-size:.85rem;
+  font-family:"DM Mono",ui-monospace,monospace;
+}
+
+/* ---------- masthead ---------- */
+header.mast{margin:0 0 1.75rem}
+header.mast .kicker{color:var(--muted);font-size:.95rem;margin:.9rem 0 .3rem}
+header.mast h1{font-size:clamp(1.7rem,5vw,2.4rem);color:var(--teal);font-weight:700}
+
+/* ---------- panels ---------- */
+.panel{
+  background:var(--card);
+  border:1px solid var(--rule);
+  border-left:6px solid var(--accent);
+  border-radius:3px;
+  padding:1.25rem 1.4rem;
+  margin:0 0 1.25rem;
+}
+.panel h2{font-size:1.35rem;color:var(--teal);margin-bottom:.15rem}
+.panel h3{font-size:1.05rem;color:var(--teal);margin:1.4rem 0 .5rem}
+.panel .sub{color:var(--muted);font-size:.95rem}
+ul.plain{margin:.6rem 0 0;padding-left:1.1rem}
+ul.plain li{margin:.3rem 0}
+
+/* ---------- progress ---------- */
+.progress{display:flex;gap:.4rem;margin:0 0 1.1rem;flex-wrap:wrap}
+.progress .step{
+  flex:1 1 4rem;
+  border:1px solid var(--rule);
+  background:#fff;
+  border-radius:2px;
+  padding:.35rem .5rem;
+  font-size:.8rem;
+  color:var(--muted);
+  text-align:center;
+}
+.progress .step.done{background:var(--teal);color:#fff;border-color:var(--teal)}
+.progress .step.now{background:var(--lime);border-color:#9dba52;color:var(--teal);font-weight:700}
+
+/* ---------- questions ---------- */
+.q{padding:1.1rem 0;border-top:1px solid var(--rule)}
+.q:first-of-type{border-top:0}
+.q .stem{display:flex;gap:.7rem;align-items:flex-start}
+.q .num{
+  font-family:"DM Mono",ui-monospace,monospace;
+  color:var(--teal);
+  font-weight:500;
+  min-width:1.9rem;
+}
+.q .marks{color:var(--muted);font-size:.85rem;white-space:nowrap;margin-left:auto;padding-left:.6rem}
+.opts{margin:.6rem 0 0 2.6rem;display:grid;gap:.35rem}
+.opt{display:flex;gap:.6rem;align-items:flex-start;padding:.4rem .55rem;border-radius:3px;cursor:pointer}
+.opt:hover{background:#eef7fb}
+.opt input{margin-top:.35rem;accent-color:var(--teal);width:1.05rem;height:1.05rem;flex:none}
+.opt.correct{background:#e8f5ec;box-shadow:inset 3px 0 0 var(--sage)}
+.opt.wrong{background:#fdecea;box-shadow:inset 3px 0 0 var(--coral)}
+textarea{
+  width:100%;margin:.6rem 0 0;padding:.7rem .8rem;
+  border:1px solid var(--rule);border-radius:3px;
+  font-family:inherit;font-size:1rem;line-height:1.5;background:#fbfdfe;color:var(--ink);
+  resize:vertical;min-height:5.5rem;
+}
+input[type=text],input[type=number]{
+  padding:.5rem .6rem;border:1px solid var(--rule);border-radius:3px;
+  font-family:inherit;font-size:1rem;background:#fbfdfe;color:var(--ink);
+}
+textarea:focus,input:focus,button:focus-visible,.opt:focus-within{outline:3px solid var(--teal);outline-offset:2px}
+
+/* ---------- balancing ---------- */
+.eq{margin:.7rem 0 0 2.6rem;display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;font-size:1.15rem}
+.eq input{width:3.1rem;text-align:center;font-family:"DM Mono",ui-monospace,monospace}
+.eq .arrow{color:var(--teal);padding:0 .2rem}
+.eq.correct input{border-color:var(--sage);background:#eef8f1}
+.eq.wrong input{border-color:var(--coral);background:#fdf0ef}
+
+/* ---------- data table ---------- */
+table.data{border-collapse:collapse;margin:.9rem 0 0;width:100%;font-size:.95rem}
+table.data th,table.data td{border:1px solid var(--rule);padding:.45rem .6rem;text-align:left}
+table.data th{background:#eef7fb;color:var(--teal)}
+table.data td:first-child{font-family:"DM Mono",ui-monospace,monospace}
+
+/* ---------- self marking ---------- */
+.model{
+  margin:.7rem 0 0 2.6rem;background:#f3f9f5;border-left:4px solid var(--sage);
+  padding:.7rem .9rem;border-radius:0 3px 3px 0;font-size:.97rem;
+}
+.model strong{color:var(--teal)}
+.marker{margin:.7rem 0 0 2.6rem;display:flex;gap:.45rem;align-items:center;flex-wrap:wrap}
+.marker .lab{font-size:.9rem;color:var(--muted);margin-right:.2rem}
+.marker button{
+  font-family:"DM Mono",ui-monospace,monospace;font-size:1rem;
+  min-width:2.5rem;padding:.35rem .5rem;cursor:pointer;
+  border:1px solid var(--rule);background:#fff;color:var(--ink);border-radius:3px;
+}
+.marker button[aria-pressed=true]{background:var(--teal);color:#fff;border-color:var(--teal)}
+.fb{margin:.55rem 0 0 2.6rem;font-size:.95rem;font-weight:600}
+.fb.ok{color:#2f7a4d}
+.fb.no{color:#c0392b}
+.hidden{display:none}
+
+/* ---------- buttons ---------- */
+.actions{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.5rem 0 0}
+.btn{
+  font-family:inherit;font-size:1rem;font-weight:700;
+  padding:.7rem 1.3rem;border-radius:3px;cursor:pointer;border:1px solid var(--teal);
+  background:var(--teal);color:#fff;
+}
+.btn:hover{background:var(--teal-mid)}
+.btn.ghost{background:#fff;color:var(--teal)}
+.btn.ghost:hover{background:#eef7fb}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ---------- results ---------- */
+.scoretable{border-collapse:collapse;width:100%;margin:1.1rem 0 0}
+.scoretable th,.scoretable td{border-bottom:1px solid var(--rule);padding:.55rem .4rem;text-align:left}
+.scoretable th{color:var(--teal);font-size:.9rem}
+.scoretable td.n{font-family:"DM Mono",ui-monospace,monospace;text-align:right;white-space:nowrap}
+.scoretable tr.total td{font-weight:700;border-top:2px solid var(--teal);border-bottom:0}
+.code{
+  margin:1.3rem 0 0;background:var(--teal);color:#fff;border-radius:4px;padding:1rem 1.2rem;
+}
+.code .val{font-family:"DM Mono",ui-monospace,monospace;font-size:2rem;color:var(--lime);letter-spacing:.12em}
+.code p{margin:.4rem 0 0;font-size:.93rem;color:#bcd9e6}
+.timer{font-family:"DM Mono",ui-monospace,monospace;color:var(--muted);font-size:.9rem}
+
+@media (max-width:520px){
+  .opts,.eq,.model,.marker,.fb{margin-left:0}
+  body{font-size:16px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .panel{animation:rise .25s ease-out}
+  @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+}
+@media print{
+  .actions,.progress{display:none}
+  body{background:#fff}
+}
+</style>
 </head>
-<body class="home">
-  <div class="site-bar">
-    <div class="wrap"><strong>Seaford Secondary College</strong><span>Year 9 Science: Chemical sciences</span></div>
+<body>
+<div class="wrap">
+
+<header class="mast">
+  <div class="readout">
+    <span class="digits" id="readout">00.0</span>
+    <span class="unit">/ 50 marks</span>
+    <span class="tag" id="timer"></span>
   </div>
+  <p class="kicker">Year 9 Science · Chemical Reactions · Practice test</p>
+  <h1>Weigh what you know</h1>
+</header>
 
-  <main>
-    <section class="hero wrap">
-      <div class="hero-text">
-        <h1><span>Nothing lost,</span><span>nothing made.</span></h1>
-        <p class="lede">In a chemical reaction, atoms swap partners but never disappear. In this lesson you will prove it, write it down as an equation, and balance it.</p>
-        <a class="btn btn-primary" id="startBtn" href="activities/nothing-is-lost.html">Start activity 1</a>
-      </div>
+<div class="progress" id="progress" hidden></div>
+<main id="main"></main>
 
-      <figure class="hero-scale part-3">
-        <svg viewBox="0 0 520 330" role="img" aria-labelledby="scaleTitle">
-          <title id="scaleTitle">A balance scale weighing the atoms on each side of the equation for making water</title>
-          <rect x="195" y="300" width="130" height="16" rx="8" fill="#013148"/>
-          <rect x="254" y="92" width="12" height="212" fill="#013148"/>
-          <g id="beam" style="transform-box: view-box; transform-origin: 260px 90px;">
-            <rect x="70" y="85" width="380" height="10" rx="5" fill="#013148"/>
-          </g>
-          <g class="pan" id="panL">
-            <line x1="0" y1="0" x2="-72" y2="118" stroke="#013148" stroke-width="2"/>
-            <line x1="0" y1="0" x2="72" y2="118" stroke="#013148" stroke-width="2"/>
-            <g id="partsL"></g>
-            <path d="M -88 118 Q 0 158 88 118 Z" fill="#FFFFFF" stroke="#013148" stroke-width="3"/>
-            <text x="0" y="174" text-anchor="middle" font-size="15" font-weight="700" fill="#45606F">Reactants</text>
-          </g>
-          <g class="pan" id="panR">
-            <line x1="0" y1="0" x2="-72" y2="118" stroke="#013148" stroke-width="2"/>
-            <line x1="0" y1="0" x2="72" y2="118" stroke="#013148" stroke-width="2"/>
-            <g id="partsR"></g>
-            <path d="M -88 118 Q 0 158 88 118 Z" fill="#FFFFFF" stroke="#013148" stroke-width="3"/>
-            <text x="0" y="174" text-anchor="middle" font-size="15" font-weight="700" fill="#45606F">Products</text>
-          </g>
-          <circle cx="260" cy="90" r="11" fill="#BDD675" stroke="#013148" stroke-width="3"/>
-        </svg>
+</div>
 
-        <div class="scale-eq" id="scaleEq" aria-label="Equation with adjustable coefficients"></div>
-        <div class="scale-readout">
-          <div>Left side <br><b id="countL">2 H, 2 O</b></div>
-          <div>Right side <br><b id="countR">2 H, 1 O</b></div>
-        </div>
-        <p class="scale-status" id="scaleStatus" aria-live="polite"></p>
-        <figcaption>The scale weighs the atoms written on each side. Change the big numbers until it sits level.</figcaption>
-      </figure>
-    </section>
+<script>
+"use strict";
 
-    <section class="intentions wrap">
-      <div>
-        <h2>Learning intentions</h2>
-        <ul>
-          <li>Understand that atoms are rearranged, not created or destroyed, in a chemical reaction.</li>
-          <li>Learn how to represent reactions with word equations and symbol equations.</li>
-          <li>Learn how to balance a chemical equation.</li>
-        </ul>
-      </div>
-      <div>
-        <h2>Success criteria</h2>
-        <p>I can:</p>
-        <ul>
-          <li>explain the law of conservation of mass using the idea of atoms</li>
-          <li>predict and explain mass changes in open and closed systems</li>
-          <li>calculate a missing mass in a reaction</li>
-          <li>write a word equation from a description</li>
-          <li>count the atoms in a chemical formula</li>
-          <li>balance an equation by changing coefficients, not subscripts</li>
-        </ul>
-      </div>
-    </section>
+/* ============ content ============ */
 
-    <section class="path wrap" aria-labelledby="pathTitle">
-      <div class="path-head">
-        <h2 id="pathTitle">Your activities</h2>
-        <div class="path-progress">
-          <p id="progressText">0 of 11 complete</p>
-          <div class="meter"><span id="progressMeter"></span></div>
-        </div>
-      </div>
-      <p class="small">Work through them in order. Your ticks are saved on this device and browser.</p>
-      <div id="activityList"></div>
-    </section>
+const SECTIONS = [
+  {
+    id:"A", title:"Section A — Multiple choice", accent:"var(--lime)",
+    blurb:"Choose the best answer. One mark each.", marks:10,
+    items:[
+      {t:"mc", q:"A substance made of two or more different elements chemically joined together is called:",
+       opts:["a mixture","an element","a compound","a solution"], a:2, m:1},
+      {t:"mc", q:"Which of the following is an element?",
+       opts:["NaCl","Fe","CO<sub>2</sub>","Air"], a:1, m:1},
+      {t:"mc", q:"How many atoms in total are in one unit of Ca(NO<sub>3</sub>)<sub>2</sub>?",
+       opts:["5","6","9","11"], a:2, m:1},
+      {t:"mc", q:"How many oxygen atoms are in Al<sub>2</sub>(SO<sub>4</sub>)<sub>3</sub>?",
+       opts:["4","7","9","12"], a:3, m:1},
+      {t:"mc", q:"Which of the following is a chemical change?",
+       opts:["Crushing chalk into powder","Iron rusting in damp air","Boiling water in a kettle","Dissolving sugar in tea"], a:1, m:1},
+      {t:"mc", q:"Which observation is the strongest evidence that a chemical reaction has occurred?",
+       opts:["A solid dissolving to make a clear solution","Steam rising from a hot beaker","A new gas bubbling out of a mixture that also gets hot","A liquid changing shape when it is poured"], a:2, m:1},
+      {t:"mc", q:"In the equation 2Na + Cl<sub>2</sub> → 2NaCl, the product is:",
+       opts:["Na only","Cl<sub>2</sub> only","2Na and Cl<sub>2</sub>","2NaCl"], a:3, m:1},
+      {t:"mc", q:"The state symbol (s) tells you the substance is:",
+       opts:["a solid","dissolved in water","a gas","a pure liquid"], a:0, m:1},
+      {t:"mc", q:"Iron wool is heated in an open crucible sitting on a balance. It glows and turns black. The balance reading will:",
+       opts:["increase","decrease","stay the same","decrease then increase"], a:0, m:1},
+      {t:"mc", q:"When you balance an equation, which part of a formula must you never change?",
+       opts:["the coefficient in front","the subscripts inside","the state symbol","the arrow"], a:1, m:1}
+    ]
+  },
+  {
+    id:"B", title:"Section B — Short answer", accent:"var(--coral)",
+    blurb:"Write your answer, then mark yourself against the model answer. 14 marks.", marks:14,
+    items:[
+      {t:"self", q:"Explain the difference between an element and a compound.", m:2,
+       model:"An element contains only one type of atom and cannot be broken down into anything simpler by a chemical reaction (for example copper, Cu). A compound contains two or more different elements chemically bonded together in fixed proportions, and it can be broken down chemically into its elements (for example water, H<sub>2</sub>O).",
+       guide:"1 mark for each idea, clearly stated. An example on its own does not earn the mark."},
+      {t:"self", q:"State how many atoms of each element are in Mg(NO<sub>3</sub>)<sub>2</sub>.", m:2,
+       model:"Magnesium: 1. Nitrogen: 2. Oxygen: 6. The subscript 2 outside the bracket multiplies everything inside it.",
+       guide:"2 marks for all three correct. 1 mark for one error. 0 for two or more errors."},
+      {t:"self", q:"Define a chemical change and give one example.", m:2,
+       model:"A chemical change produces one or more new substances with different properties, and it is usually difficult to reverse. Example: burning methane in a Bunsen burner produces carbon dioxide and water.",
+       guide:"1 mark for the definition mentioning new substances, 1 mark for a valid example."},
+      {t:"self", q:"List four observable signs that a chemical reaction has occurred.", m:2,
+       model:"Any four of: a colour change, a gas produced (bubbling or fizzing), a precipitate (solid) forming, a temperature change, light or sound produced, a new smell.",
+       guide:"2 marks for four correct signs, 1 mark for two or three, 0 for one."},
+      {t:"self", q:"Explain the difference between the state symbols (g) and (aq).", m:3,
+       model:"(g) means the substance is a gas: its particles are spread far apart and move freely, filling whatever container it is in. (aq) means aqueous: the substance is dissolved in water, so its particles are mixed among the water particles. A substance labelled (aq) is not a gas, and it is not pure water either, it is a solution.",
+       guide:"1 mark for gas explained, 1 mark for dissolved in water explained, 1 mark for making the contrast clear."},
+      {t:"self", q:"State the law of conservation of mass, then explain in terms of atoms why it must be true.", m:3,
+       model:"The law of conservation of mass says that in a chemical reaction the total mass of the reactants equals the total mass of the products. Mass is not created or destroyed. This must be true because a reaction only rearranges atoms: the bonds between atoms break and new bonds form, but no atom disappears and no new atom appears. The same atoms are present before and after, so the total mass is unchanged.",
+       guide:"1 mark for stating the law, 1 mark for atoms being rearranged not created or destroyed, 1 mark for linking the same atoms to the same total mass."}
+    ]
+  },
+  {
+    id:"C", title:"Section C — Balancing equations", accent:"var(--sky)",
+    blurb:"Type a coefficient in every box. Use 1 where no extra number is needed. 2 marks each.", marks:8,
+    items:[
+      {t:"bal", m:2, parts:["N<sub>2</sub>","H<sub>2</sub>"], prods:["NH<sub>3</sub>"], a:[1,3,2]},
+      {t:"bal", m:2, parts:["Na","Cl<sub>2</sub>"], prods:["NaCl"], a:[2,1,2]},
+      {t:"bal", m:2, parts:["C<sub>3</sub>H<sub>8</sub>","O<sub>2</sub>"], prods:["CO<sub>2</sub>","H<sub>2</sub>O"], a:[1,5,3,4]},
+      {t:"bal", m:2, parts:["Fe","O<sub>2</sub>"], prods:["Fe<sub>2</sub>O<sub>3</sub>"], a:[4,3,2]}
+    ]
+  },
+  {
+    id:"D", title:"Section D — Practical and data", accent:"var(--sage)",
+    blurb:"Use the results table to answer the questions. 10 marks.", marks:10,
+    intro:`<p>A Year 9 class dropped marble chips (calcium carbonate) into hydrochloric acid and recorded the mass of the container and contents every 30 seconds. They ran the reaction twice, once in an open conical flask and once in a sealed plastic bottle.</p>
+    <table class="data">
+      <thead><tr><th>Time (s)</th><th>Open flask (g)</th><th>Sealed bottle (g)</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>210.50</td><td>210.50</td></tr>
+        <tr><td>30</td><td>209.62</td><td>210.50</td></tr>
+        <tr><td>60</td><td>209.05</td><td>210.50</td></tr>
+        <tr><td>90</td><td>208.74</td><td>210.50</td></tr>
+        <tr><td>120</td><td>208.66</td><td>210.50</td></tr>
+        <tr><td>150</td><td>208.66</td><td>210.50</td></tr>
+      </tbody>
+    </table>`,
+    items:[
+      {t:"num", q:"Calculate the total mass lost from the open flask. Give your answer in grams.", m:2, a:1.84, tol:0.005, unit:"g",
+       model:"210.50 g − 208.66 g = 1.84 g"},
+      {t:"text", q:"Name the gas that escaped from the open flask.", m:1, accept:["carbon dioxide","co2","co₂","carbon dioxide gas"],
+       model:"Carbon dioxide."},
+      {t:"self", q:"Explain why the mass of the open flask decreased.", m:1,
+       model:"The carbon dioxide produced by the reaction escaped from the open flask into the room, so the gas was no longer being weighed.",
+       guide:"1 mark for gas leaving the open system."},
+      {t:"self", q:"Explain why the mass of the sealed bottle did not change.", m:2,
+       model:"The bottle was sealed, so the carbon dioxide could not escape. It stayed inside the bottle and was still sitting on the balance, so every atom present at the start was still being weighed at the end. The atoms were only rearranged into new substances, not lost.",
+       guide:"1 mark for the gas being trapped, 1 mark for linking this to no atoms leaving the system."},
+      {t:"self", q:"The open flask reading stopped changing after 120 seconds. What does this tell you about the reaction?", m:2,
+       model:"The reaction had finished by 120 seconds. No more gas was being produced, so no more mass was being lost. One of the reactants, most likely the marble chips or the acid, had been completely used up.",
+       guide:"1 mark for the reaction finishing, 1 mark for a reactant being used up or no more gas being produced."},
+      {t:"self", q:"Do these results support the law of conservation of mass? Justify your answer using the data.", m:2,
+       model:"Yes. The sealed bottle stayed at 210.50 g for the whole 150 seconds, which shows that when nothing can escape, the total mass does not change. The open flask appeared to lose 1.84 g, but that mass was not destroyed. It left as carbon dioxide gas. If that escaped gas could have been weighed as well, the total would still be 210.50 g.",
+       guide:"1 mark for using the sealed bottle data as evidence, 1 mark for explaining the open flask loss as escaped gas rather than destroyed mass."}
+    ]
+  },
+  {
+    id:"E", title:"Section E — Extended response", accent:"var(--pink)",
+    blurb:"Answer in full paragraphs using correct scientific vocabulary. 8 marks.", marks:8,
+    intro:`<p>A student seals two spoons of bicarbonate of soda and a beaker of vinegar inside a strong zip-lock bag and places the whole bag on an electronic balance. The mixture fizzes loudly, the bag puffs up like a pillow, and the bag feels cold to touch. Through all of this the balance reading stays exactly the same.</p>
+    <p>The student then opens one corner of the bag. The reading immediately begins to drop.</p>`,
+    items:[
+      {t:"essay", m:8,
+       q:"Explain the chemistry of what has happened. In your answer you should:",
+       bullets:[
+         "state whether this is a physical or a chemical change, and give two signs as evidence",
+         "name the reactants and the products, and write a word equation",
+         "explain why the balance reading did not change while the bag was sealed, referring to the law of conservation of mass",
+         "explain why the reading dropped once the bag was opened, and predict what the balance would have shown if the reaction had been run in an open beaker from the start"
+       ],
+       model:`<p><strong>Chemical change (2 marks).</strong> This is a chemical change. Evidence includes the production of a new gas (fizzing and the bag inflating) and the temperature drop, which shows energy was absorbed. A new substance has been made and the change cannot easily be reversed.</p>
+       <p><strong>Reactants, products and word equation (2 marks).</strong> The reactants are bicarbonate of soda (sodium hydrogen carbonate) and vinegar (acetic acid). The products are carbon dioxide gas, water and a salt (sodium acetate).<br>
+       bicarbonate of soda + vinegar → carbon dioxide + water + sodium acetate</p>
+       <p><strong>Why the sealed reading stayed the same (2 marks).</strong> The bag was a closed system. The carbon dioxide produced was trapped inside the bag, so it was still being weighed by the balance even though it had changed from a solid and a liquid into a gas. The reaction only rearranged the atoms present at the start. No atoms were created and none were destroyed, so the total mass stayed the same. This is the law of conservation of mass.</p>
+       <p><strong>Opening the bag, and the open beaker prediction (2 marks).</strong> Opening the corner turned the closed system into an open one. The carbon dioxide escaped into the room, so it was no longer sitting on the balance and the reading fell. The mass was not destroyed, it just left the balance. If the reaction had been run in an open beaker from the start, the reading would have fallen steadily from the beginning and then levelled off once the reaction finished, because the gas would have escaped as fast as it was made.</p>`,
+       guide:"Award up to 2 marks for each of the four bullet points. Full marks need correct vocabulary: reactants, products, closed system, conservation of mass."}
+    ]
+  }
+];
 
-    <section class="keywords wrap" aria-labelledby="kwTitle">
-      <h2 id="kwTitle" class="section-title part-1">Key words</h2>
-      <dl>
-        <div><dt>Reactant</dt><dd>A substance you start with. Reactants go on the left of the arrow.</dd></div>
-        <div><dt>Product</dt><dd>A new substance made in the reaction. Products go on the right.</dd></div>
-        <div><dt>Law of conservation of mass</dt><dd>The total mass of the reactants equals the total mass of the products.</dd></div>
-        <div><dt>Closed system</dt><dd>A setup nothing can get into or out of, such as a sealed bottle.</dd></div>
-        <div><dt>Open system</dt><dd>A setup where substances, especially gases, can enter or escape.</dd></div>
-        <div><dt>Chemical formula</dt><dd>Symbols and numbers that show the atoms in a substance, such as H<sub>2</sub>O.</dd></div>
-        <div><dt>Subscript</dt><dd>The small number after a symbol. It counts atoms inside one particle.</dd></div>
-        <div><dt>Coefficient</dt><dd>The big number in front of a formula. It counts whole particles.</dd></div>
-        <div><dt>Balanced equation</dt><dd>An equation with the same number of each type of atom on both sides.</dd></div>
-      </dl>
-    </section>
-  </main>
+/* ============ state ============ */
 
-  <footer class="site-foot">
-    <div class="wrap">
-      <span>Year 9 Science, Seaford Secondary College. Australian Curriculum: AC9S9U07</span>
-      <button type="button" id="resetBtn">Clear my ticks</button>
+const state = { idx:-1, mc:{}, bal:{}, num:{}, txt:{}, self:{}, essay:"", name:"", started:null, checked:{} };
+const el = id => document.getElementById(id);
+const main = el("main");
+
+/* ============ helpers ============ */
+
+function key(sec,i){ return sec.id + i; }
+
+function sectionScore(sec){
+  let s = 0;
+  sec.items.forEach((it,i)=>{
+    const k = key(sec,i);
+    if(it.t==="mc"){ if(state.mc[k]===it.a) s += it.m; }
+    else if(it.t==="bal"){ if(balCorrect(it,k)) s += it.m; }
+    else if(it.t==="num"){ if(numCorrect(it,k)) s += it.m; }
+    else if(it.t==="text"){ s += textCorrect(it,k) ? it.m : (state.self[k] || 0); }
+    else { s += (state.self[k] || 0); }
+  });
+  return s;
+}
+
+function balCorrect(it,k){
+  const v = state.bal[k];
+  if(!v) return false;
+  return it.a.every((n,j)=> Number(v[j]) === n);
+}
+function numCorrect(it,k){
+  const v = parseFloat(state.num[k]);
+  return !isNaN(v) && Math.abs(v - it.a) <= it.tol;
+}
+function textCorrect(it,k){
+  const v = (state.txt[k]||"").trim().toLowerCase().replace(/[.,]/g,"");
+  return it.accept.some(a => v === a || v.includes(a));
+}
+function totalScore(){ return SECTIONS.reduce((t,s)=> t + sectionScore(s), 0); }
+
+function setReadout(val,max){
+  el("readout").textContent = Number(val).toFixed(1).padStart(4,"0");
+  if(max) document.querySelector(".readout .unit").textContent = "/ " + max + " marks";
+}
+
+function drawProgress(){
+  const p = el("progress");
+  if(state.idx < 0){ p.hidden = true; return; }
+  p.hidden = false;
+  p.innerHTML = SECTIONS.map((s,i)=>{
+    const cls = i < state.idx ? "step done" : (i === state.idx ? "step now" : "step");
+    return `<div class="${cls}">${s.id} · ${s.marks}</div>`;
+  }).join("") + `<div class="${state.idx>=SECTIONS.length?"step now":"step"}">Result</div>`;
+}
+
+function startTimer(){
+  state.started = Date.now();
+  const t = el("timer");
+  setInterval(()=>{
+    if(!state.started) return;
+    const s = Math.floor((Date.now()-state.started)/1000);
+    t.textContent = String(Math.floor(s/60)).padStart(2,"0") + ":" + String(s%60).padStart(2,"0");
+  },1000);
+}
+
+/* completion code: derived from the score so the teacher can verify it */
+function makeCode(score){
+  const L = "BCDFGHJKLMNPQRSTVWXYZ";
+  const a = L[(score*5+3) % 21];
+  const b = L[(score*11+7) % 21];
+  const n = String((score*13+29) % 100).padStart(2,"0");
+  return a + b + n;
+}
+
+/* ============ screens ============ */
+
+function renderIntro(){
+  main.innerHTML = `
+  <section class="panel" style="--accent:var(--teal)">
+    <h2>Before you start</h2>
+    <p class="sub">Chemical Reactions · 50 marks · about 50 minutes</p>
+    <ul class="plain">
+      <li>There are five sections. Finish one section before moving to the next. You cannot go back.</li>
+      <li>Sections A, C and part of D are marked for you.</li>
+      <li>Sections B, E and the rest of D are marked by you against a model answer. Be honest. A mark you did not earn teaches you nothing.</li>
+      <li>Work on your own, closed book, the way you would in the real test.</li>
+      <li>At the end you get a score out of 50 and a short code. Give the code and your score to Mr Carter.</li>
+    </ul>
+    <h3>Your name</h3>
+    <input type="text" id="nameIn" placeholder="First name and surname" style="width:min(100%,22rem)" autocomplete="name">
+    <div class="actions">
+      <button class="btn" id="go">Start the test</button>
     </div>
-  </footer>
+  </section>`;
+  el("go").onclick = ()=>{
+    state.name = el("nameIn").value.trim();
+    state.idx = 0;
+    startTimer();
+    renderSection();
+  };
+}
 
-  <script src="js/lesson.js"></script>
-  <script>
-  (function () {
-    const { ACTIVITIES, PARTS, Progress, el, stepper, Chem } = Lesson;
+function itemHTML(sec,it,i){
+  const k = key(sec,i);
+  const num = globalNumber(sec,i);
+  let body = "";
 
-    /* ----- Activity list ----- */
-    function renderList() {
-      const list = document.getElementById('activityList');
-      list.innerHTML = '';
-      [1, 2, 3].forEach(p => {
-        const part = el('section', { class: 'part part-' + p });
-        const acts = ACTIVITIES.filter(a => a.part === p);
-        part.append(el('h3', { class: 'part-title', html: 'Part ' + p + ': ' + PARTS[p].name + '<small>' + acts.length + ' activities</small>' }));
-        const ul = el('ul', { class: 'act-list' });
-        acts.forEach(a => {
-          const n = ACTIVITIES.indexOf(a) + 1;
-          const done = Progress.isDone(a.id);
-          ul.append(el('li', null, [
-            el('a', { class: 'act' + (done ? ' done' : ''), href: 'activities/' + a.file }, [
-              el('span', { class: 'act-num', 'aria-hidden': 'true', text: done ? '\u2713' : String(n) }),
-              el('span', null, [
-                el('span', { class: 'act-title', text: n + '. ' + a.title }),
-                el('span', { class: 'act-blurb', text: a.blurb })
-              ]),
-              el('span', { class: 'act-meta' }, [
-                el('span', { class: 'act-type', text: a.type }), el('br'),
-                document.createTextNode('About ' + a.mins + ' min'),
-                done ? el('span', { class: 'act-done', text: 'Completed' }) : null
-              ])
-            ])
-          ]));
-        });
-        part.append(ul);
-        list.append(part);
-      });
-      const count = Progress.doneCount();
-      document.getElementById('progressText').textContent = count + ' of ' + ACTIVITIES.length + ' complete';
-      document.getElementById('progressMeter').style.width = (count / ACTIVITIES.length * 100) + '%';
-      const btn = document.getElementById('startBtn');
-      const nextIdx = ACTIVITIES.findIndex(a => !Progress.isDone(a.id));
-      if (count === 0) { btn.textContent = 'Start activity 1'; btn.href = 'activities/' + ACTIVITIES[0].file; }
-      else if (nextIdx === -1) { btn.textContent = 'All done. Review any activity below'; btn.href = '#pathTitle'; }
-      else { btn.textContent = 'Continue with activity ' + (nextIdx + 1); btn.href = 'activities/' + ACTIVITIES[nextIdx].file; }
-    }
-    renderList();
-    document.getElementById('resetBtn').addEventListener('click', () => {
-      if (confirm('Clear all ticks and saved progress on this device?')) { Progress.reset(); renderList(); }
+  if(it.t==="mc"){
+    body = `<div class="opts" role="radiogroup" aria-label="Question ${num}">` +
+      it.opts.map((o,j)=>`
+        <label class="opt" data-k="${k}" data-j="${j}">
+          <input type="radio" name="q${k}" value="${j}">
+          <span>${o}</span>
+        </label>`).join("") + `</div>`;
+  }
+  else if(it.t==="bal"){
+    let n = 0, html = "";
+    it.parts.forEach((p,j)=>{
+      if(j) html += `<span>+</span>`;
+      html += `<input type="number" min="1" max="20" inputmode="numeric" aria-label="coefficient ${n+1}" data-k="${k}" data-j="${n}"><span>${p}</span>`;
+      n++;
     });
+    html += `<span class="arrow">→</span>`;
+    it.prods.forEach((p,j)=>{
+      if(j) html += `<span>+</span>`;
+      html += `<input type="number" min="1" max="20" inputmode="numeric" aria-label="coefficient ${n+1}" data-k="${k}" data-j="${n}"><span>${p}</span>`;
+      n++;
+    });
+    body = `<div class="eq" id="eq${k}">${html}</div>`;
+  }
+  else if(it.t==="num"){
+    body = `<div class="opts"><span><input type="number" step="0.01" data-num="${k}" style="width:7rem"> ${it.unit}</span></div>`;
+  }
+  else if(it.t==="text"){
+    body = `<div class="opts"><input type="text" data-txt="${k}" style="width:min(100%,18rem)"></div>`;
+  }
+  else if(it.t==="essay"){
+    body = `<ul class="plain">${it.bullets.map(b=>`<li>${b}</li>`).join("")}</ul>
+      <textarea data-essay="1" rows="14" placeholder="Write your full answer here."></textarea>`;
+  }
+  else {
+    body = `<textarea data-self="${k}" placeholder="Write your answer here."></textarea>`;
+  }
 
-    /* ----- Balance scale hero ----- */
-    const eq = { reactants: ['H2', 'O2'], products: ['H2O'] };
-    const coefs = [1, 1, 1];
-    const SVGNS = 'http://www.w3.org/2000/svg';
-    const ATOM = { H: { r: 9.5, fill: '#FFFFFF' }, O: { r: 13.5, fill: '#F46E63' } };
+  return `<div class="q">
+    <div class="stem">
+      <span class="num">${num}.</span>
+      <span>${it.q || ""}</span>
+      <span class="marks">${it.m} ${it.m===1?"mark":"marks"}</span>
+    </div>
+    ${body}
+    <div class="fb hidden" id="fb${k}"></div>
+    <div class="model hidden" id="md${k}"></div>
+    <div class="marker hidden" id="mk${k}"></div>
+  </div>`;
+}
 
-    function circle(g, x, y, e) {
-      const c = document.createElementNS(SVGNS, 'circle');
-      c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', ATOM[e].r);
-      c.setAttribute('fill', ATOM[e].fill); c.setAttribute('stroke', '#013148'); c.setAttribute('stroke-width', '2');
-      g.append(c);
-    }
-    function drawMol(g, type, x, y) {
-      if (type === 'H2') { circle(g, x - 8, y + 4, 'H'); circle(g, x + 8, y + 4, 'H'); }
-      if (type === 'O2') { circle(g, x - 10.5, y, 'O'); circle(g, x + 10.5, y, 'O'); }
-      if (type === 'H2O') { circle(g, x - 13, y - 9, 'H'); circle(g, x + 13, y - 9, 'H'); circle(g, x, y, 'O'); }
-    }
-    function drawPan(gId, mols) {
-      const g = document.getElementById(gId);
-      g.innerHTML = '';
-      const slots = [-60, -20, 20, 60];
-      mols.forEach((m, i) => {
-        const row = Math.floor(i / 4), col = i % 4;
-        drawMol(g, m, slots[col], 106 - row * 32);
+function globalNumber(sec,i){
+  let n = 0;
+  for(const s of SECTIONS){
+    if(s.id === sec.id) return n + i + 1;
+    n += s.items.length;
+  }
+  return n + i + 1;
+}
+
+function renderSection(){
+  const sec = SECTIONS[state.idx];
+  drawProgress();
+  setReadout(totalScore(), 50);
+  main.innerHTML = `
+  <section class="panel" style="--accent:${sec.accent}">
+    <h2>${sec.title}</h2>
+    <p class="sub">${sec.blurb}</p>
+    ${sec.intro || ""}
+    ${sec.items.map((it,i)=>itemHTML(sec,it,i)).join("")}
+    <div class="actions">
+      <button class="btn" id="check">Check this section</button>
+      <button class="btn ghost hidden" id="next">Next section</button>
+    </div>
+  </section>`;
+  window.scrollTo({top:0,behavior:"instant"});
+  wireInputs(sec);
+  el("check").onclick = ()=>checkSection(sec);
+  el("next").onclick = ()=>{
+    state.idx++;
+    if(state.idx >= SECTIONS.length) renderResults(); else renderSection();
+  };
+}
+
+function wireInputs(sec){
+  main.querySelectorAll(".opt").forEach(l=>{
+    l.addEventListener("click", ()=>{
+      state.mc[l.dataset.k] = Number(l.dataset.j);
+    });
+  });
+  main.querySelectorAll(".eq input").forEach(inp=>{
+    inp.addEventListener("input", ()=>{
+      const k = inp.dataset.k;
+      state.bal[k] = state.bal[k] || [];
+      state.bal[k][Number(inp.dataset.j)] = inp.value;
+    });
+  });
+  main.querySelectorAll("[data-num]").forEach(inp=>{
+    inp.addEventListener("input", ()=> state.num[inp.dataset.num] = inp.value);
+  });
+  main.querySelectorAll("[data-txt]").forEach(inp=>{
+    inp.addEventListener("input", ()=> state.txt[inp.dataset.txt] = inp.value);
+  });
+  main.querySelectorAll("[data-essay]").forEach(t=>{
+    t.addEventListener("input", ()=> state.essay = t.value);
+  });
+}
+
+function checkSection(sec){
+  sec.items.forEach((it,i)=>{
+    const k = key(sec,i);
+    const fb = el("fb"+k), md = el("md"+k), mk = el("mk"+k);
+
+    if(it.t==="mc"){
+      main.querySelectorAll(`.opt[data-k="${k}"]`).forEach(l=>{
+        const j = Number(l.dataset.j);
+        l.querySelector("input").disabled = true;
+        if(j === it.a) l.classList.add("correct");
+        else if(state.mc[k] === j) l.classList.add("wrong");
       });
+      const right = state.mc[k] === it.a;
+      fb.className = "fb " + (right ? "ok" : "no");
+      fb.textContent = right ? "Correct. 1 mark." : "Not this time. The green option is the answer. 0 marks.";
+      fb.classList.remove("hidden");
     }
-
-    function update() {
-      const [a, b, c] = coefs;
-      drawPan('partsL', Array(a).fill('H2').concat(Array(b).fill('O2')));
-      drawPan('partsR', Array(c).fill('H2O'));
-
-      const massL = a * 2 + b * 32, massR = c * 18;
-      const d = massL - massR;
-      const tilt = d === 0 ? 0 : Math.sign(d) * Math.min(16, 4 + Math.abs(d) * 0.25);
-      const ang = -tilt * Math.PI / 180;
-      document.getElementById('beam').style.transform = 'rotate(' + (-tilt) + 'deg)';
-      const L = 180;
-      const lx = 260 - L * Math.cos(ang), ly = 90 - L * Math.sin(ang);
-      const rx = 260 + L * Math.cos(ang), ry = 90 + L * Math.sin(ang);
-      document.getElementById('panL').style.transform = 'translate(' + lx + 'px,' + ly + 'px)';
-      document.getElementById('panR').style.transform = 'translate(' + rx + 'px,' + ry + 'px)';
-
-      const s = Chem.status(eq, coefs);
-      const byEl = {}; s.rows.forEach(r => { byEl[r.el] = r; });
-      document.getElementById('countL').textContent = byEl.H.left + ' H, ' + byEl.O.left + ' O';
-      document.getElementById('countR').textContent = byEl.H.right + ' H, ' + byEl.O.right + ' O';
-      const msg = document.getElementById('scaleStatus');
-      if (!s.balanced) {
-        msg.textContent = 'Not balanced. ' + s.rows.filter(r => r.left !== r.right)
-          .map(r => Chem.NAMES[r.el][0].toUpperCase() + Chem.NAMES[r.el].slice(1) + ' atoms: ' + r.left + ' on the left, ' + r.right + ' on the right.').join(' ');
-      } else if (!s.simplest) {
-        msg.textContent = 'Level, but not finished. Every number can be divided by ' + s.divisor + '.';
-      } else {
-        msg.textContent = 'Balanced. ' + byEl.H.left + ' hydrogen and ' + byEl.O.left + ' oxygen atoms on each side, so no mass goes missing.';
+    else if(it.t==="bal"){
+      const eq = el("eq"+k);
+      const right = balCorrect(it,k);
+      eq.classList.add(right ? "correct" : "wrong");
+      eq.querySelectorAll("input").forEach(x=>x.disabled = true);
+      fb.className = "fb " + (right ? "ok" : "no");
+      fb.textContent = right ? "Balanced correctly. 2 marks." : "Not balanced. Correct coefficients: " + it.a.join(", ") + ". 0 marks.";
+      fb.classList.remove("hidden");
+    }
+    else if(it.t==="num" || it.t==="text"){
+      const right = it.t==="num" ? numCorrect(it,k) : textCorrect(it,k);
+      fb.className = "fb " + (right ? "ok" : "no");
+      fb.textContent = right ? `Correct. ${it.m} ${it.m===1?"mark":"marks"}.` : "Not correct. 0 marks.";
+      fb.classList.remove("hidden");
+      md.innerHTML = `<strong>Model answer:</strong> ${it.model}`;
+      md.classList.remove("hidden");
+      const inp = main.querySelector(it.t==="num" ? `[data-num="${k}"]` : `[data-txt="${k}"]`);
+      if(inp) inp.disabled = true;
+      if(it.t==="text" && !right){
+        // allow an honest override for a correct answer spelled unusually
+        buildMarker(mk,k,it.m,"Marked wrong but you named the right gas? Award it here:");
       }
     }
+    else {
+      const ta = main.querySelector(it.t==="essay" ? "[data-essay]" : `[data-self="${k}"]`);
+      if(ta) ta.disabled = true;
+      md.innerHTML = (it.t==="essay" ? it.model : `<strong>Model answer:</strong> ${it.model}`) +
+        (it.guide ? `<p style="margin:.5rem 0 0;color:var(--muted)"><strong>Marking:</strong> ${it.guide}</p>` : "");
+      md.classList.remove("hidden");
+      buildMarker(mk,k,it.m,"Compare your answer with the model, then award yourself:");
+    }
+  });
 
-    const holder = document.getElementById('scaleEq');
-    const names = ['hydrogen molecules', 'oxygen molecules', 'water molecules'];
-    const parts = [];
-    eq.reactants.concat(eq.products).forEach((f, i) => {
-      const st = stepper({ value: 1, min: 1, max: 4, label: names[i], onChange: v => { coefs[i] = v; update(); } });
-      parts.push(el('span', { class: 'field' }, [st.node, el('span', { html: Chem.fhtml(f) })]));
-    });
-    holder.append(parts[0], el('span', { class: 'op', text: '+' }), parts[1], el('span', { class: 'op', html: '&rarr;' }), parts[2]);
-    update();
-  })();
-  </script>
+  el("check").disabled = true;
+  el("next").classList.remove("hidden");
+  el("next").textContent = state.idx === SECTIONS.length-1 ? "See my result" : "Next section";
+  setReadout(totalScore(), 50);
+}
+
+function buildMarker(mk,k,max,label){
+  let html = `<span class="lab">${label}</span>`;
+  for(let n=0;n<=max;n++){
+    html += `<button type="button" data-mark="${k}" data-v="${n}" aria-pressed="false">${n}</button>`;
+  }
+  mk.innerHTML = html;
+  mk.classList.remove("hidden");
+  mk.querySelectorAll("button").forEach(b=>{
+    b.onclick = ()=>{
+      state.self[k] = Number(b.dataset.v);
+      mk.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed", x===b ? "true" : "false"));
+      setReadout(totalScore(), 50);
+    };
+  });
+}
+
+function renderResults(){
+  state.started = null;
+  drawProgress();
+  const total = totalScore();
+  setReadout(total, 50);
+  const pct = Math.round(total/50*100);
+  const rows = SECTIONS.map(s=>{
+    const got = sectionScore(s);
+    return `<tr><td>${s.title.replace(/^Section /,"")}</td><td class="n">${got} / ${s.marks}</td></tr>`;
+  }).join("");
+  const weak = SECTIONS.filter(s => sectionScore(s)/s.marks < 0.6).map(s=>s.id);
+  const advice = weak.length
+    ? `Go back over ${weak.length===1?"section":"sections"} ${weak.join(", ")} before the real test. That is where the marks are sitting.`
+    : "Solid across every section. Keep the balancing practice ticking over so it stays quick.";
+
+  main.innerHTML = `
+  <section class="panel" style="--accent:var(--lime)">
+    <h2>Result${state.name ? " for " + state.name : ""}</h2>
+    <p class="sub">${total} out of 50 · ${pct}%</p>
+    <table class="scoretable">
+      <thead><tr><th>Section</th><th style="text-align:right">Marks</th></tr></thead>
+      <tbody>${rows}<tr class="total"><td>Total</td><td class="n">${total} / 50</td></tr></tbody>
+    </table>
+    <p style="margin-top:1.1rem">${advice}</p>
+    <div class="code">
+      <div class="val">${makeCode(total)}</div>
+      <p>Give this code and your score to Mr Carter. The code is generated from your score, so write both down exactly.</p>
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="window.print()">Print or save this page</button>
+      <button class="btn ghost" onclick="location.reload()">Start again</button>
+    </div>
+  </section>`;
+  window.scrollTo({top:0,behavior:"instant"});
+}
+
+setReadout(0,50);
+renderIntro();
+</script>
 </body>
 </html>
